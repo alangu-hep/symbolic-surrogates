@@ -61,7 +61,7 @@ def register_forward_hooks(location_dict, outputs):
             print(f'\nForward Hook Registered: {hook_name}')
         except TypeError:
             print('Location Dict value must be a valid module for forward hook registration')
-            _remove_all_forward_hooks(value)
+            remove_all_forward_hooks(value)
             break
 
     return handles
