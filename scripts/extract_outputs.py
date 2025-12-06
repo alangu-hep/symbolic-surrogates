@@ -18,7 +18,7 @@ from weaver.utils.nn.tools import evaluate_classification
 from weaver.utils.logger import _logger, warn_n_times
 
 from utils.nn_utils.part_prediction import test_load
-from utils.download_utils.io_writer import _write_outputs_to_root
+from utils.download_utils.io_writer import _write_outputs_to_root, _hook_output_handler
 from utils.nn_utils.hook_handler import register_forward_hooks, remove_all_forward_hooks, remove_handles
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -38,7 +38,7 @@ parser.add_argument('--demo', action='store_true', default=False,
                     help='Setup a demo that uses only 10% of the dataset')
 
 # Network Loading
-parser.add_argument('-m', '--target_modules', nargs = '*', default=[], 
+parser.add_argument('-m', '--target_modules', nargs = '*', default=['logits'], 
                     help='Target Modules for Hooking. SUPPORTED: ')
 parser.add_argument('-n', '--network-script', type=str, default=str((workingdir_path / 'part_models/ParticleTransformer_network.py')), help='Network for ParT')
 
@@ -118,12 +118,14 @@ interesting_layers = {
     'first_cls_attn': model.mod.cls_blocks[0].attn,
     'first_cls_block': model.mod.cls_blocks[0],
     'final_cls_attn': model.mod.cls_blocks[1].attn,
-    'final_cls_block': model.mod.cls_blocks[1]
+    'final_cls_block': model.mod.cls_blocks[1],
+    'logits': model.mod.fc
 }
 
 filtered_modules = {key: value for key, value in interesting_layers.items() if key in args.target_modules}
 
-hook_outputs = {name: [] for name in filtered_modules.keys()}
+hook_outputs = {}
+hook_inputs = {}
 
 remove_all_forward_hooks(model) # Safety Precaution
 
@@ -135,6 +137,7 @@ Prediction
 
 output_dict = {
     'predictions': {},
+    'hooks': {}
 }
 
 test_loaders, data_config = test_load(args)
@@ -150,7 +153,7 @@ for name, get_test_loader in test_loaders.items():
     _logger.info('Test metric %.5f' % test_metric, color='bold')
     
     to_append = {
-        'logits': scores,
+        'scores': scores,
         'labels': labels
     }
 
@@ -158,6 +161,9 @@ for name, get_test_loader in test_loaders.items():
     output_dict['predictions'].update(observers)
     
     del test_loader
+
+for key, value in hook_outputs.items():
+    output_dict['hooks'][key] = _hook_output_handler(value, library = 'ak')
 
 remove_handles(handles)
 

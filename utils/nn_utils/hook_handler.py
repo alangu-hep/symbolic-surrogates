@@ -36,7 +36,6 @@ def save_outputs(name, outputs):
 
     return hook
 
-
 def register_forward_hooks(location_dict, outputs):
     """
     REQUIREMENTS:

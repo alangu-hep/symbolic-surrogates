@@ -3,7 +3,7 @@ Adapted from ParT repo
 '''
 
 import torch
-from ParticleTransformer import ParticleTransformer
+from weaver.nn.model.ParticleTransformer import ParticleTransformer
 from weaver.utils.logger import _logger
 
 class ParticleTransformerWrapper(torch.nn.Module):
