@@ -1,67 +1,97 @@
 import torch
 
-def remove_all_forward_hooks( model: torch.nn.Module) -> None:
-
-    print('\nRemoving all hooks within the model\n')
-    
-    for _, module in model.named_modules():
-        module._forward_hooks.clear()
-
-def remove_handles(handle_dict) -> None:
-
-    print('\nRemoving all handles')
-    
-    for name, handle in handle_dict.items():
-        handle.remove()
-
-    print('\nHandles removed successfully\n')
-
-def save_outputs(name, outputs):
-    def hook(module, input, output):
-
-        location = outputs[name]
+class HookHandler():
+    def __init__(self, model: torch.nn.Module, hook_manager: dict):
         
-        if isinstance(output, torch.Tensor):
-            location.append(output.detach())
-            return
+        self.model = model if not hasattr(model, 'mod') else model.mod
+        self.manager = hook_manager
         
-        if isinstance(output, (tuple, list)):
-            location.append(tuple(
-                o.detach() if isinstance(o, torch.Tensor) else o
-                for o in output
-            ))
-            return
+        self.handles = {
+            hook_type: {name: value for name, value in hook_dict.items()} 
+            for hook_type, hook_dict in self.manager.items()}
+        self.hook_outputs = {
+            hook_type: {name: [] for name in hook_dict.keys()} 
+            for hook_type, hook_dict in self.manager.items()}
+
+    @staticmethod
+    def clear_handles(handles: dict):
+        print('\nRemoving all handles')
+
+        for hook_type, hook_dict in handles.items():
+            for handle in hook_dict.values():
+                handle.remove()
+
+    @staticmethod
+    def remove_all_hooks(model: torch.nn.Module):
+        
+        print('\nRemoving all hooks within the model')
+        
+        for _, module in model.named_modules():
+            module._forward_hooks.clear()
+            module._forward_pre_hooks.clear()
             
-        location.append(output)
-
-    return hook
-
-def register_forward_hooks(location_dict, outputs):
-    """
-    REQUIREMENTS:
-    -location_dict must be in the format 'hook name': specific module within the model
-    -outputs must be a dictionary
-    """
-    
-    if not isinstance(location_dict, dict):
-        print("location_dict must be in the format 'hook name': specific module within the model")
-        return None
-
-    for key in location_dict.keys():
-        outputs[key] = []
-
-    handles = {}
-    
-    for key, value in location_dict.items():
+    @staticmethod
+    def save_inputs(name, outputs):
+        def hook(module, input):
         
-        hook_name = key
+            location = outputs[name]
+            
+            if isinstance(input, torch.Tensor):
+                location.append(input.detach())
+                return
+            
+            if isinstance(input, (tuple, list)):
+                location.append([
+                    i.detach() if isinstance(i, torch.Tensor) else i
+                    for i in input
+                ])
+                return
+                
+            location.append(input)
+        
+        return hook
 
-        try:
-            handles[hook_name] = value.register_forward_hook(save_outputs(hook_name, outputs))
-            print(f'\nForward Hook Registered: {hook_name}')
-        except TypeError:
-            print('Location Dict value must be a valid module for forward hook registration')
-            remove_all_forward_hooks(value)
-            break
+    @staticmethod
+    def save_outputs(name, outputs):
+        def hook(module, input, output):
+        
+            location = outputs[name]
+            
+            if isinstance(output, torch.Tensor):
+                location.append(output.detach())
+                return
+            
+            if isinstance(output, (tuple, list)):
+                location.append([
+                    o.detach() if isinstance(o, torch.Tensor) else o
+                    for o in output
+                ])
+                return
+                
+            location.append(output)
+        
+        return hook
 
-    return handles
+    def registration(self, safety_remove = False):
+        if safety_remove:
+            HookHandler.remove_all_hooks(self.model)
+        
+        for hook_type, hook_dict in self.manager.items():  
+            try:
+                for hook_name, attr in hook_dict.items():
+                    
+                    attr_object = getattr(self.model, attr)
+                    
+                    if hook_type == 'forward_hooks':
+                        self.handles[hook_type][hook_name] = attr_object.register_forward_hook(HookHandler.save_outputs(hook_name, self.hook_outputs[hook_type]))
+                        print(f'\nForward Hook Registered: {hook_name}')
+                    elif hook_type == 'pre_forward_hooks':
+                        self.handles[hook_type][hook_name] = attr_object.register_forward_pre_hook(HookHandler.save_inputs(hook_name, self.hook_outputs[hook_type]))
+                        print(f'\nForward Hook Registered: {hook_name}')
+                        
+            except TypeError:
+                print('\nFailed to register hooks. Resetting model')
+                HookHandler.remove_all_hooks(self.model)
+                break
+        
+        return self.handles, self.hook_outputs

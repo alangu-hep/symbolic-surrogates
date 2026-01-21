@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-# In[1]:
-
-
 import pysr
-
-
-# In[2]:
 
 
 import os
@@ -16,6 +10,7 @@ workdir = os.getenv("PATH_TO_PARTGP")
 sys.path.append(workdir)
 
 import torch
+import sympy
 import uproot
 import awkward as ak
 import numpy
@@ -60,7 +55,7 @@ inputs = df.values
 input_names = df.columns.tolist()
 outputs = houtputs['logits'].array(library = 'np')
 
-sr_outputs = workdir + '/outputs/pysr_outputs/demo_run'
+sr_outputs = workdir + '/outputs/pysr_outputs/sr_tests'
 
 model = PySRRegressor(
     maxsize=40,
@@ -72,6 +67,8 @@ model = PySRRegressor(
     unary_operators = ["abs", "log", "sqrt", "relu"],
     constraints = {'^': (-1, 1)},
     output_directory = sr_outputs,
+    output_torch_format=True,
+    extra_torch_mappings = {sympy.sqrt: torch.sqrt},
     elementwise_loss="loss(prediction, target) = (prediction - target)^2")
 
 model.fit(inputs, outputs, variable_names = input_names)
