@@ -172,6 +172,7 @@ def cont_sort(x, perm=None, temp=1):
 
 class Encoder(nn.Module):
     def __init__(self, input_dims,
+                 set_size,
                  phi_sizes=(100, 100, 128),
                  use_bn=False,
                  latent_dim=8,
@@ -214,23 +215,30 @@ class Decoder(nn.Module):
     def __init__(
         self,
         input_dims,
+        set_size,
         fc_sizes = (128, 128, 128),
         use_bn = False,
         latent_dim = 8,
         relaxed=True,
         n_pieces=20,
+        expander_relu=False,
         **kwargs
     ):
         super(Decoder, self).__init__(**kwargs)
 
+        self.set_size = set_size
         self.latent_dim = latent_dim
-        self.expand = nn.Linear(latent_dim, latent_dim*2)
-        self.unpool = FSPool(latent_dim*2, n_pieces=n_pieces, relaxed=relaxed)
+        self.expand = nn.Sequential(
+            nn.Linear(latent_dim, latent_dim*set_size),
+            nn.ReLU() if expander_relu else nn.Identity()
+        )
+        
+        #self.unpool = FSPool(latent_dim*2, n_pieces=n_pieces, relaxed=relaxed)
         
         fc_layers = []
         for i in range(len(fc_sizes)):
             fc_layers.append(nn.Sequential(
-                nn.Conv1d(latent_dim*2 if i == 0 else fc_sizes[i - 1], fc_sizes[i], kernel_size=1),
+                nn.Conv1d(latent_dim if i == 0 else fc_sizes[i - 1], fc_sizes[i], kernel_size=1),
                 nn.BatchNorm1d(fc_sizes[i]) if use_bn and i != len(fc_sizes)-1 else nn.Identity(),
                 nn.ReLU() if i != len(fc_sizes) - 1 else nn.Identity())
             )
@@ -238,11 +246,12 @@ class Decoder(nn.Module):
         self.fc = nn.Sequential(*fc_layers)
         self.final = nn.Conv1d(fc_sizes[-1], input_dims, kernel_size=1)
         
-    def forward(self, z, perm, n_points):
+    def forward(self, z, mask):
         x = self.expand(z)
-        x, mask = self.unpool.forward_transpose(x, perm, n=n_points)
+        x = x.unflatten(-1, (self.latent_dim, self.set_size))
+        #x, mask = self.unpool.forward_transpose(x, perm, n=n_points)
         x = self.fc(x)
-        x = self.final(x) * mask[:, :1, :]
+        x = self.final(x) * mask
         
         return x
 
@@ -250,19 +259,21 @@ class DeepSetAutoencoder(torch.nn.Module):
     def __init__(
         self,
         input_dims,
+        set_size,
         phi_sizes=(128, 128, 128),
         fc_sizes = (128, 128, 128),
         use_bn=False,
         latent_dim=8,
         relaxed=True,
         n_pieces=20,
+        expander_relu=False,
         **kwargs
     ):
 
         super(DeepSetAutoencoder, self).__init__(**kwargs)
 
-        self.encoder = Encoder(input_dims, phi_sizes, use_bn, latent_dim, relaxed, n_pieces)
-        self.decoder = Decoder(input_dims, fc_sizes, use_bn, latent_dim, relaxed, n_pieces)
+        self.encoder = Encoder(input_dims, set_size, phi_sizes, use_bn, latent_dim, relaxed, n_pieces)
+        self.decoder = Decoder(input_dims, set_size, fc_sizes, use_bn, latent_dim, relaxed, n_pieces, expander_relu)
 
     def reparametrize(self, mean, log_var):
 
@@ -277,7 +288,9 @@ class DeepSetAutoencoder(torch.nn.Module):
         mean, log_var, perm = self.encoder(features, n)
 
         z = self.reparametrize(mean, log_var)
-        x = self.decoder(z, perm, n)
+
+        mask = mask.unsqueeze(1)
+        x = self.decoder(z, mask)
 
         return x, mean, log_var, z
         
@@ -294,11 +307,13 @@ def get_model(data_config, **kwargs):
 
     cfg = dict(
         input_dims=len(data_config.input_dicts['pf_features']),
+        set_size=data_config.input_shapes['pf_features'][-1],
         phi_sizes=(256, 256, 256),
-        fc_sizes = (128, 128, 128),
+        fc_sizes = (64, 64),
         use_bn=False,
-        latent_dim=16,
+        latent_dim=8,
         relaxed=True,
+        expander_relu=False,
         n_pieces=20
     )
     cfg.update(**kwargs)

@@ -88,37 +88,44 @@ def initialize_models(args, training, network, model_path=None):
 
 def save_logits(args, metrics_dict):
 
-    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
+    fig, ax = plt.subplots(nrows=2, ncols=2, layout='constrained', figsize=(12, 12))
     logits = metrics_dict['preds']['logits']
     bkg = logits[:, 0]
     signal = logits[:, 1]
     confident = np.max(logits, axis=1)
     least_confident = np.min(logits, axis=1)
     ax[0, 0].hist(signal, bins=100)
-    ax[0, 0].set_title('Signal Logit Distribution')
+    ax[0, 0].set_title('Signal Logits')
     ax[0, 0].set_xlabel('Value')
     ax[0, 0].set_ylabel('log(Counts)')
 
     ax[0, 1].hist(bkg, bins=100)
-    ax[0, 1].set_title('Background Logit Distribution')
+    ax[0, 1].set_title('Background Logits')
     ax[0, 1].set_xlabel('Value')
     ax[0, 1].set_ylabel('log(Counts)')
 
     ax[1, 0].hist(confident, bins=100)
-    ax[1, 0].set_title('Most Confident Logit Distribution')
+    ax[1, 0].set_title('Most Confident Logits')
     ax[1, 0].set_xlabel('Value')
     ax[1, 0].set_ylabel('log(Counts)')
 
     ax[1, 1].hist(least_confident, bins=100)
-    ax[1, 1].set_title('Least Confident Logit Distribution')
+    ax[1, 1].set_title('Least Confident Logits')
     ax[1, 1].set_xlabel('Value')
     ax[1, 1].set_ylabel('log(Counts)')
+
+    model_name = os.path.basename(args.model_prefix)
+    fig.suptitle(str(model_name))
 
     for i in range(2):
         for j in range(2):
             ax[i, j].set_yscale('log')
 
-    fig.savefig(f'{args.figures_prefix}_logits.png', dpi=300, bbox_inches='tight', transparent=True, format='png')
+    dirname = os.path.dirname(args.figures_prefix)
+    if dirname and not os.path.exists(dirname):
+        os.makedirs(dirname)
+
+    fig.savefig(f'{args.figures_prefix}_logits.png', dpi=300, format='png')
 
     plt.close(fig)
 
@@ -313,22 +320,23 @@ def knowledge_distillation(args, loader_dict, teacher_dict, student_dict):
 
     save_logits(args, logit_dict)
 
-def svae(args, loader_dict, vae_dict, teacher_dict):
+def vae(args, loader_dict, model_dict):
 
-    vae = copy.deepcopy(vae_dict['model']).to(device)
-    teacher = copy.deepcopy(teacher_dict['model']).to(device)
-    opt, scheduler = optim(args, vae, device)
+    model = copy.deepcopy(model_dict['model']).to(device)
+    opt, scheduler = optim(args, model, device)
     grad_scaler = torch.amp.GradScaler("cuda")
 
     train_size = (1e+08 * (0.2)) * args.data_fraction
     val_size = (5e+06 * (0.2)) * args.data_fraction
     test_size = (2e+07 * (0.2)) * args.data_fraction
 
+    annealer = None
+
     if args.kl_anneal:
         _logger.info('Using KL Annealer')
-        steps = int(train_size)
+        steps_per_epoch = int(train_size / args.batch_size)
         annealer = annealing.Annealer(
-            total_steps=steps,
+            total_steps=steps_per_epoch,
             shape='cosine',
             baseline=0,
             r_value=0.5,
@@ -340,7 +348,106 @@ def svae(args, loader_dict, vae_dict, teacher_dict):
         beta=args.beta,
         gamma=args.gamma,
         use_mss=True,
-        annealer=annealer if args.kl_anneal else None
+        bit=args.bit_size,
+        annealer=annealer
+    )
+
+    recon_loss = losses.ChamferDist()
+
+    model_trainer = trainer.TCVAETrainer(
+        vae_loss = vae_loss,
+        recon_loss = recon_loss,
+        dataset_size = train_size,
+        model=model,
+        opt=opt,
+        scheduler=scheduler,
+        train_loader=loader_dict['train'],
+        device=device,
+        grad_scaler=grad_scaler,
+        clip_norm=1.0
+    )
+
+    _logger.info('Trainer Initialized')
+
+    for epoch in range(args.num_epochs):
+        _logger.info('-' * 50)
+        _logger.info('Epoch #%d training' % epoch)
+        model_trainer.train()
+
+        if args.model_prefix:
+            dirname = os.path.dirname(args.model_prefix)
+            if dirname and not os.path.exists(dirname):
+                os.makedirs(dirname)
+            state_dict = model.module.state_dict() if isinstance(
+                model, (torch.nn.DataParallel, torch.nn.parallel.DistributedDataParallel)) else model.state_dict()
+            torch.save(state_dict, args.model_prefix + '_epoch-%d_state.pt' % epoch)
+            torch.save(opt.state_dict(), args.model_prefix + '_epoch-%d_optimizer.pt' % epoch)
+
+        _logger.info(f'Starting Validation for epoch {epoch}')
+        
+        model_val=evaluation.TCVAEStats(
+            vae_loss=vae_loss,
+            recon_loss=recon_loss,
+            dataset_size=val_size,
+            model=model,
+            device=device,
+            loader=loader_dict['val'],
+            split='val'
+        )
+        
+        _logger.info('Validator Initialized')
+        val_dict = model_val.run()
+        dict_print = pformat(val_dict, indent=2)
+        _logger.info(f"Val Dict:\n{dict_print}")
+
+    _logger.info(f'Testing Model')
+    
+    model_tester = evaluation.TCVAEStats(
+        vae_loss = vae_loss,
+        recon_loss = recon_loss,
+        dataset_size = test_size,
+        model=model,
+        device=device,
+        loader=loader_dict['test'],
+        split='test'
+    )
+
+    _logger.info('Tester Initialized')
+    test_dict = model_tester.run()
+    dict_print = pformat(test_dict, indent=2)
+    _logger.info(f"Test Dict:\n{dict_print}")
+
+def svae(args, loader_dict, vae_dict, teacher_dict):
+
+    vae = copy.deepcopy(vae_dict['model']).to(device)
+    teacher = copy.deepcopy(teacher_dict['model']).to(device)
+    opt, scheduler = optim(args, vae, device)
+    grad_scaler = torch.amp.GradScaler("cuda")
+
+    train_size = (1e+08 * (0.2)) * args.data_fraction
+    val_size = (5e+06 * (0.2)) * args.data_fraction
+    test_size = (2e+07 * (0.2)) * args.data_fraction
+
+    annealer = None
+    if args.kl_anneal:
+        steps_per_epoch = int(train_size / args.batch_size)
+        _logger.info('Using KL Annealer')
+        steps = int(train_size)
+        annealer = annealing.Annealer(
+            total_steps=steps_per_epoch,
+            shape='cosine',
+            baseline=0,
+            r_value=0.5,
+            cyclical=True
+        )
+
+    vae_loss = losses.TCVAELoss(
+        alpha=args.alpha,
+        beta=args.beta,
+        gamma=args.gamma,
+        use_mss=True,
+        bit=args.bit_size,
+        annealer=annealer
     )
 
 # potentially implement supervised annealer?
@@ -450,6 +557,33 @@ def symbolic_regression(args, loader_dict, model_dict, vae_dict):
     dict_print = pformat(test_dict, indent=2)
     _logger.info(f"Test Dict:\n{dict_print}")
 
+def classifier_logits(args, loader_dict, model_dict):
+
+    model = copy.deepcopy(model_dict['model']).to(device)
+    loss_fn = nn.CrossEntropyLoss()
+    opt, scheduler = optim(args, model, device)
+    grad_scaler = torch.amp.GradScaler("cuda")
+
+    model_name = args.model_prefix[args.model_prefix.rfind('/') + 1:]
+    _logger.info(f'Model Name: {model_name}')
+
+# remove this later
+
+    _logger.info('Evaluating for training set logits')
+
+    logit_tester = evaluation.ClassificationStats(
+        loss_fn,
+        model=model,
+        device=device,
+        loader=loader_dict['train'],
+        split='test'
+    )
+
+    _logger.info('Train Set Tester Initialized')
+    logit_dict = logit_tester.run()
+
+    save_logits(args, logit_dict)
+    
 def main():
 
     args = setup_argparse().parse_args()
@@ -478,11 +612,20 @@ def main():
         vae_dict = initialize_models(args, training=True, network=args.dr_network)
         teacher_dict = initialize_models(args, training=True, network=args.model_network, model_path=args.model_path)
         svae(args, loader_dict, vae_dict, teacher_dict)
+    elif args.comp == 'DR':
+        _logger.info('Performing Dimensionality Reduction')
+        vae_dict = initialize_models(args, training=True, network=args.dr_network)
+        vae(args, loader_dict, vae_dict)
     elif args.comp == 'SR':
         _logger.info('Performing Symbolic Regression')
         vae_dict = initialize_models(args, training=True, network=args.dr_network, model_path=args.dr_path)
         model_dict = initialize_models(args, training=True, network=args.model_network, model_path=args.model_path)
         symbolic_regression(args, loader_dict, model_dict, vae_dict)
+    elif args.comp == 'LOGITS':
+        _logger.info('Fetching logits for model')
+        model_dict = initialize_models(args, training=False, network=args.model_network, model_path=args.model_path)
+        classifier_logits(args, loader_dict, model_dict)
+        
 
     end = time.time()
     elapsed_time = end - start

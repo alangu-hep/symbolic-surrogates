@@ -288,17 +288,17 @@ class TCVAEStats(ModelStats):
         recon_loss = recon_loss.item()
 
         self.track_avg({
-            'Avg MIL': mi_loss,
-            'Avg TCL': tc_loss,
-            'Avg DWKL': dw_kl_loss,
-            'Avg Recon Loss': recon_loss,
+            'AvgMIL': mi_loss,
+            'AvgTCL': tc_loss,
+            'AvgDWKL': dw_kl_loss,
+            'AvgReconLoss': recon_loss,
         })
 
         extra_display = {
             'MIL': '%.5f' % mi_loss,
             'TCL': '%.5f' % tc_loss,
             'DWKL': '%.5f' % dw_kl_loss,
-            'Recon Loss': '%.5f' % recon_loss,
+            'ReconLoss': '%.5f' % recon_loss,
             'Beta': '%.2f' % beta
         }
         return loss, extra_display

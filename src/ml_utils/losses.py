@@ -66,7 +66,7 @@ class ChamferDist(BaseLoss):
             recon_valid = recon_valid.T
             target_valid = target_valid.T
             
-            dist = torch.cdist(recon_valid, target_valid, p=2)
+            dist = torch.cdist(recon_valid, target_valid, p=self.p)
             
             if self.squared:
                 dist = dist.pow(2)
@@ -77,13 +77,14 @@ class ChamferDist(BaseLoss):
         return torch.stack(batch_losses).mean()
 
 class TCVAELoss(BaseLoss):
-    def __init__(self, alpha, beta, gamma, use_mss=True, **kwargs):
+    def __init__(self, alpha, beta, gamma, use_mss=True, bit=None, **kwargs):
         super(TCVAELoss, self).__init__(**kwargs)
         
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
         self.mss = use_mss
+        self.bit = bit
 
     def forward(self, latent_sample, distribution, data_size):
         log_pz, log_qz, log_prod_qzi, log_q_zCx = _get_log_pz_qz_prodzi_qzCx(latent_sample,
@@ -97,11 +98,16 @@ class TCVAELoss(BaseLoss):
         # dw_kl_loss is KL[q(z)||p(z)] instead of usual KL[q(z|x)||p(z))]
         dw_kl_loss = (log_prod_qzi - log_pz).mean()
 
-        if self.annealer():
-            self.beta *= self.annealer()
+        beta = self.beta
+        
+        if self.annealer is not None:
+            beta = self.beta * self.annealer()
             self.annealer.step()
 
-        return mi_loss, tc_loss, dw_kl_loss, self.alpha, self.beta, self.gamma
+        if self.bit is not None:
+            dw_kl_loss = torch.clamp(dw_kl_loss, min=self.bit)
+
+        return mi_loss, tc_loss, dw_kl_loss, self.alpha, beta, self.gamma
 
 def matrix_log_density_gaussian(x, mu, logvar):
     """Calculates log density of a Gaussian for all combination of bacth pairs of

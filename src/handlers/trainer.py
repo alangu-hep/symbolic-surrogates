@@ -157,10 +157,10 @@ class TCVAETrainer(BaseTrainer):
         recon_loss = recon_loss.item()
 
         self.track_avg({
-            'Avg MIL': mi_loss,
-            'Avg TCL': tc_loss,
-            'Avg DWKL': dw_kl_loss,
-            'Avg Recon Loss': recon_loss,
+            'AvgMIL': mi_loss,
+            'AvgTCL': tc_loss,
+            'AvgDWKL': dw_kl_loss,
+            'AvgReconLoss': recon_loss,
         })
 
         extra_display = {
