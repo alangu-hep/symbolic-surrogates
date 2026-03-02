@@ -21,7 +21,6 @@ SIGNALS=(
 
 # Run-Specific
 
-SIGNAL=TTBar
 COMP=DL
 
 MODEL=ParT

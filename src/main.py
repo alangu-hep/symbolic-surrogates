@@ -343,21 +343,17 @@ def vae(args, loader_dict, model_dict):
             cyclical=True
         )
 
-    vae_loss = losses.TCVAELoss(
-        alpha=args.alpha,
+    vae_loss = losses.BVAELoss(
         beta=args.beta,
-        gamma=args.gamma,
-        use_mss=True,
-        bit=args.bit_size,
-        annealer=annealer
+        bit=args.bit_size
     )
 
     recon_loss = losses.ChamferDist()
 
-    model_trainer = trainer.TCVAETrainer(
+    model_trainer = trainer.BVAETrainer(
         vae_loss = vae_loss,
         recon_loss = recon_loss,
-        dataset_size = train_size,
+        annealer=annealer,
         model=model,
         opt=opt,
         scheduler=scheduler,
@@ -385,10 +381,9 @@ def vae(args, loader_dict, model_dict):
 
         _logger.info(f'Starting Validation for epoch {epoch}')
         
-        model_val=evaluation.TCVAEStats(
+        model_val=evaluation.BVAEStats(
             vae_loss=vae_loss,
             recon_loss=recon_loss,
-            dataset_size=val_size,
             model=model,
             device=device,
             loader=loader_dict['val'],
@@ -402,10 +397,9 @@ def vae(args, loader_dict, model_dict):
 
     _logger.info(f'Testing Model')
     
-    model_tester = evaluation.TCVAEStats(
+    model_tester = evaluation.BVAEStats(
         vae_loss = vae_loss,
         recon_loss = recon_loss,
-        dataset_size = test_size,
         model=model,
         device=device,
         loader=loader_dict['test'],

@@ -250,6 +250,55 @@ class KDStats(ModelStats):
         }
         return loss, extra_display
 
+class BVAEStats(ModelStats):
+    def __init__(self, vae_loss, recon_loss, **kwargs):
+        super(BVAEStats, self).__init__(**kwargs)
+        self.vae_loss = vae_loss
+        self.recon_loss = recon_loss
+        
+    def val_metrics(self):
+        
+        latents = self.output_dict['preds']['latents']
+        samples = self.output_dict['preds']['samples']
+        
+        self.output_dict['interpretability']['latent_variances'] = interpretability.latent_variances(latents)
+        self.output_dict['interpretability']['active_units'] = interpretability.active_units(samples)
+        
+    def test_metrics(self):
+
+        self.val_metrics()
+        
+        self.output_dict['complexity']['num_params'].append(complexity.total_params(self.model)[0])
+    
+    def compute_loss(self, inputs, label, mask):
+        reconstructed, mean, log_var, z = self.model(*inputs)
+        target = inputs[1]
+        rec_mask = inputs[3].squeeze(1)
+        kld_loss, beta = self.vae_loss(mean, log_var)
+        recon_loss = self.recon_loss(reconstructed, target, rec_mask)
+        loss = beta*kld_loss + recon_loss
+
+        self.output_dict['inputs']['features'].append(target.detach())
+        self.output_dict['inputs']['mask'].append(inputs[3].detach())
+        self.output_dict['preds']['recon'].append(reconstructed.detach())
+        self.output_dict['preds']['latents'].append(torch.cat([mean, log_var], axis=1).detach())
+        self.output_dict['preds']['samples'].append(z.detach())
+
+        kld_loss = kld_loss.item()
+        recon_loss = recon_loss.item()
+
+        self.track_avg({
+            'AvgKLD': kld_loss,
+            'AvgReconLoss': recon_loss,
+        })
+
+        extra_display = {
+            'KLD': '%.5f' % kld_loss,
+            'Recon Loss': '%.5f' % recon_loss,
+            'Beta': '%.2f' % beta
+        }
+        return loss, extra_display
+
 class TCVAEStats(ModelStats):
     def __init__(self, vae_loss, recon_loss, dataset_size, **kwargs):
         super(TCVAEStats, self).__init__(**kwargs)
@@ -281,6 +330,7 @@ class TCVAEStats(ModelStats):
         self.output_dict['inputs']['mask'].append(inputs[3].detach())
         self.output_dict['preds']['recon'].append(reconstructed.detach())
         self.output_dict['preds']['latents'].append(torch.cat([mean, log_var], axis=1).detach())
+
 
         mi_loss = mi_loss.item()
         tc_loss = tc_loss.item()
@@ -372,7 +422,7 @@ class SurrogateStats(ClassificationStats):
         self.dr = dr
         
     def compute_loss(self, inputs, label, mask):
-        reconstructed, mean, log_var, z, _ = self.dr(*inputs)
+        reconstructed, mean, log_var, z = self.dr(*inputs)
         model_output = self.model(torch.cat([mean, log_var], axis=1))
         logits, labels, _ = _flatten_preds(model_output, label=label, mask=mask)
         loss = self.loss(logits, label)

@@ -55,7 +55,7 @@ class SymbolicTrainer:
     
     def evaluate_input(self, inputs, mask, label):
         model_output = self.model(*inputs)
-        reconstructed, mean, log_var, z, logits = self.dr(*inputs)
+        reconstructed, mean, log_var, z = self.dr(*inputs)
 
         self.inputs.append(torch.cat([mean, log_var], axis=1).detach())
         self.logits.append(model_output.detach())

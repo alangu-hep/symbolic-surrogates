@@ -2,7 +2,7 @@
 
 # Globals
 
-set -xe
+set -x
 DATADIR=${DATADIR}/JetClass
 WORKDIR=${WORKDIR}
 CMD=${WORKDIR}/src/main.py
@@ -18,26 +18,25 @@ SIGNALS=(
     HToGG
 )
 
+
 # Run-Specific
 
-COMP=SR
 SIGNAL=TTBar
+COMP=DR
 
-MODEL=Surrogate
+MODEL=BVAE
+NETWORK=${WORKDIR}/wrappers/vae.py
 
-TEACHER_NAME=ParT
-NETWORK=${WORKDIR}/wrappers/part_wrapper.py
+DATA_FRACTION=0.1
 
-DR_NAME=BVAE
-DR_NETWORK=${WORKDIR}/wrappers/vae.py
-
-CONFIG=${WORKDIR}/data_config/JetClass/JetClass_${SIGNAL}.yaml
-MODEL_PATH=${WORKDIR}/outputs/models/${SIGNAL}/${TEACHER_NAME}/${TEACHER_NAME}_M4-PARTKD_KD_PELICAN_3_epoch-4_state.pt
-DR_PATH=${WORKDIR}/outputs/models/${SIGNAL}/${DR_NAME}/${DR_NAME}_M6-BVAE_DR_epoch-4_state.pt
-
-DATA_FRACTION=0.01
 suffix=${COMMENT:-default}
 
+for SIGNAL in "${SIGNALS[@]}"; do
+
+    echo "Signal: ${SIGNAL}"
+    CONFIG=${WORKDIR}/data_config/JetClass/JetClass_${SIGNAL}.yaml
+
+    set +e
     $CMD \
         --comp ${COMP} \
         --data-train \
@@ -58,18 +57,25 @@ suffix=${COMMENT:-default}
         --start-lr 1e-3 \
         --final-lr 1e-3 \
         --lr-scheduler flat+decay \
-        --model-network ${NETWORK} \
+        --dr-network ${NETWORK} \
+        --alpha 1 \
+        --beta 4 \
+        --gamma 1 \
+        --kl-anneal \
+        --bit-size 0.6 \
         --model-prefix ${MODEL_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${COMP} \
-        --sr-prefix ${SR_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${TEACHER_NAME}_${DR_NAME}_${COMP} \
         --log ${LOGS}/${SIGNAL}/${MODEL}_${suffix}_${COMP}_${DATE}.log \
-        --metrics-prefix ${METRIC_OUTPUTS}/${SIGNAL}/${MODEL}_${suffix}_${DATA_FRACTION}.root \
-        --max-size 40 \
-        --n-iterations 4000 \
-        --n-populations 48 \
-        --population-size 27 \
-        --iteration-cycles 1520 \
-        --dr-network ${DR_NETWORK} \
-        --dr-path ${DR_PATH} \
-        --model-path ${MODEL_PATH} \
+        --metrics-prefix ${METRIC_OUTPUTS}/${SIGNAL}/${MODEL}_${suffix}_${DATA_FRACTION}.root
+
+    EXIT_CODE=$?
+    set -e
+
+    if [ $EXIT_CODE -ne 0 ]; then
+        echo "Failed: ${SIGNAL}"
+    else
+        echo "Completed: ${SIGNAL}"
+    fi
+
+done
 
 date +%Y%m%d_%H%M%S

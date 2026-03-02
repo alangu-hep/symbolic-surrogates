@@ -136,6 +136,40 @@ class KDTrainer(BaseTrainer):
         }
         return loss, extra_display
 
+class BVAETrainer(BaseTrainer):
+    def __init__(self, vae_loss, recon_loss, annealer=None, **kwargs):
+        super(BVAETrainer, self).__init__(**kwargs)
+        self.vae_loss = vae_loss
+        self.recon_loss = recon_loss
+        self.annealer = annealer
+
+    def compute_loss(self, inputs, label, mask):
+        reconstructed, mean, log_var, z = self.model(*inputs)
+        target = inputs[1]
+        rec_mask = inputs[3].squeeze(1)
+        kld_loss, beta = self.vae_loss(mean, log_var)
+        if self.annealer is not None:
+            beta = beta * self.annealer()
+            self.annealer.step()
+        recon_loss = self.recon_loss(reconstructed, target, rec_mask)
+        loss = beta*kld_loss + recon_loss
+
+        kld_loss = kld_loss.item()
+        recon_loss = recon_loss.item()
+
+        self.track_avg({
+            'AvgKLD': kld_loss,
+            'AvgReconLoss': recon_loss,
+        })
+
+        extra_display = {
+            'KLD': '%.5f' % kld_loss,
+            'Recon Loss': '%.5f' % recon_loss,
+            'Beta': '%.2f' % beta
+        }
+        
+        return loss, extra_display
+
 class TCVAETrainer(BaseTrainer):
     def __init__(self, vae_loss, recon_loss, dataset_size, **kwargs):
         super(TCVAETrainer, self).__init__(**kwargs)

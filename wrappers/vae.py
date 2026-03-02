@@ -250,6 +250,8 @@ class Decoder(nn.Module):
         x = self.expand(z)
         x = x.unflatten(-1, (self.latent_dim, self.set_size))
         #x, mask = self.unpool.forward_transpose(x, perm, n=n_points)
+        #x = z.unsqueeze(-1)
+        #x = x.expand(z.size(0), z.size(1), self.set_size)
         x = self.fc(x)
         x = self.final(x) * mask
         
@@ -261,12 +263,12 @@ class DeepSetAutoencoder(torch.nn.Module):
         input_dims,
         set_size,
         phi_sizes=(128, 128, 128),
-        fc_sizes = (128, 128, 128),
+        fc_sizes = (64, 64),
         use_bn=False,
         latent_dim=8,
         relaxed=True,
         n_pieces=20,
-        expander_relu=False,
+        expander_relu=True,
         **kwargs
     ):
 
@@ -309,7 +311,7 @@ def get_model(data_config, **kwargs):
         input_dims=len(data_config.input_dicts['pf_features']),
         set_size=data_config.input_shapes['pf_features'][-1],
         phi_sizes=(256, 256, 256),
-        fc_sizes = (64, 64),
+        fc_sizes = (256, 256, 256),
         use_bn=False,
         latent_dim=8,
         relaxed=True,

@@ -11,3 +11,13 @@ def latent_variances(latents):
         variances.append(np.var(latents[:, i]))
 
     return variances
+
+def active_units(samples):
+
+    import numpy as np
+    variances = []
+
+    for i in range(len(samples[0])):
+        variances.append(np.var(samples[:, i]))
+
+    return variances
