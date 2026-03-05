@@ -196,23 +196,6 @@ def classifier(args, loader_dict, model_dict):
     #os.makedirs(output_dir, exist_ok=True)
     #_write_outputs_to_root(args.metrics_prefix, test_dict)
 
-# remove this later
-
-    _logger.info('Re-evaluating for training set logits')
-
-    logit_tester = evaluation.ClassificationStats(
-        loss_fn,
-        model=model,
-        device=device,
-        loader=loader_dict['train'],
-        split='test'
-    )
-
-    _logger.info('Train Set Tester Initialized')
-    logit_dict = logit_tester.run()
-
-    save_logits(args, logit_dict)
-
 def knowledge_distillation(args, loader_dict, teacher_dict, student_dict):
     student = copy.deepcopy(student_dict['model']).to(device)
     teacher = copy.deepcopy(teacher_dict['model']).to(device)
@@ -305,10 +288,8 @@ def knowledge_distillation(args, loader_dict, teacher_dict, student_dict):
 
     _logger.info('Re-evaluating for training set logits')
 
-    logit_tester = evaluation.KDStats(
-        teacher=teacher,
-        cl_loss=loss_fn,
-        kd_loss=kd_loss,
+    logit_tester = evaluation.ClassificationStats(
+        loss_fn,
         model=student,
         device=device,
         loader=loader_dict['train'],
@@ -530,6 +511,7 @@ def symbolic_regression(args, loader_dict, model_dict, vae_dict):
     model_trainer = sr_trainer.SymbolicTrainer(model, dr, loader_dict['train'], device)
     regressor = model_trainer.run(args)
 
+    _logger.info(str(regressor))
     _logger.info('Regressor Params:' + str(regressor.get_params()))
 
     modules = regressor.pytorch()

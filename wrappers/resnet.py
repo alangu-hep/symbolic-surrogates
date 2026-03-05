@@ -126,8 +126,8 @@ class CNNWrapper(torch.nn.Module):
 
 
 def get_model(data_config, **kwargs):
-    conv_params = [(32,), (64, 64), (64, 64), (128, 128)]
-    fc_params = [(512, 0.2)]
+    conv_params = [(16,), (32, 32), (32, 32), (64, 64)]
+    fc_params = [(256, 0.2)]
 
     pf_features_dims = len(data_config.input_dicts['pf_features'])
     num_classes = len(data_config.label_value)

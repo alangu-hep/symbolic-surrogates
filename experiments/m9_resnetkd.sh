@@ -2,7 +2,7 @@
 
 # Globals
 
-set -xe
+set -x
 DATADIR=${DATADIR}/JetClass
 WORKDIR=${WORKDIR}
 CMD=${WORKDIR}/src/main.py
@@ -11,6 +11,7 @@ MODEL_OUTPUTS=${WORKDIR}/outputs/models
 METRIC_OUTPUTS=${WORKDIR}/outputs/metrics
 SR_OUTPUTS=${WORKDIR}/outputs/sr_runs
 LOGS=${WORKDIR}/outputs/logs
+FIGURES=${WORKDIR}/figures
 
 SIGNALS=(
     TTBar
@@ -20,24 +21,33 @@ SIGNALS=(
 
 # Run-Specific
 
-COMP=SR
-SIGNAL=TTBar
+COMP=KD
 
-MODEL=Surrogate
+MODEL=ResNet
+NETWORK=${WORKDIR}/wrappers/resnet.py
+TEACHER_NETWORK=${WORKDIR}/wrappers/pelican_wrapper.py
+TEACHER_NAME=PELICAN
 
-TEACHER_NAME=ParT
-NETWORK=${WORKDIR}/wrappers/part_wrapper.py
+DATA_FRACTION=0.1
 
-DR_NAME=BVAE
-DR_NETWORK=${WORKDIR}/wrappers/vae.py
+TEMPS=(
+    3
+    7
+    5
+)
 
-CONFIG=${WORKDIR}/data_config/JetClass/JetClass_${SIGNAL}.yaml
-MODEL_PATH=${WORKDIR}/outputs/models/${SIGNAL}/${TEACHER_NAME}/${TEACHER_NAME}_M4-PARTKD_KD_PELICAN_3_epoch-4_state.pt
-DR_PATH=${WORKDIR}/outputs/models/${SIGNAL}/${DR_NAME}/${DR_NAME}_M6-BVAE_DR_epoch-4_state.pt
-
-DATA_FRACTION=0.01
 suffix=${COMMENT:-default}
 
+for i in "${!SIGNALS[@]}"; do
+
+    SIGNAL=${SIGNALS[$i]}
+    TEMPERATURE=${TEMPS[$i]}
+    CONFIG=${WORKDIR}/data_config/JetClass/JetClass_${SIGNAL}.yaml
+    TEACHER_PATH=${WORKDIR}/outputs/models/${SIGNAL}/${TEACHER_NAME}/${TEACHER_NAME}_M2-TEACHER_DL_epoch-4_state.pt
+    echo "Signal: ${SIGNAL}"
+
+    set +e
+    
     $CMD \
         --comp ${COMP} \
         --data-train \
@@ -59,17 +69,22 @@ suffix=${COMMENT:-default}
         --final-lr 1e-3 \
         --lr-scheduler flat+decay \
         --model-network ${NETWORK} \
-        --model-prefix ${MODEL_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${COMP} \
-        --sr-prefix ${SR_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${TEACHER_NAME}_${DR_NAME}_${COMP} \
-        --log ${LOGS}/${SIGNAL}/${MODEL}_${suffix}_${COMP}_${DATE}.log \
+        --model-prefix ${MODEL_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${COMP}_${TEACHER_NAME}_${TEMPERATURE} \
+        --log ${LOGS}/${SIGNAL}/${MODEL}_${suffix}_${COMP}_${TEACHER_NAME}_${TEMPERATURE}_${DATE}.log \
         --metrics-prefix ${METRIC_OUTPUTS}/${SIGNAL}/${MODEL}_${suffix}_${DATA_FRACTION}.root \
-        --max-size 40 \
-        --n-iterations 4000 \
-        --n-populations 48 \
-        --population-size 27 \
-        --iteration-cycles 1520 \
-        --dr-network ${DR_NETWORK} \
-        --dr-path ${DR_PATH} \
-        --model-path ${MODEL_PATH} 
+        --teacher-network ${TEACHER_NETWORK} \
+        --teacher-path ${TEACHER_PATH} \
+        --teacher-prefix ${TEACHER_NAME} \
+        --kd-temp ${TEMPERATURE} \
+        --figures-prefix ${FIGURES}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${COMP}_${TEACHER_NAME}_${TEMPERATURE}
 
-date +%Y%m%d_%H%M%S
+    EXIT_CODE=$?
+    set -e
+
+    if [ $EXIT_CODE -ne 0 ]; then
+        echo "Failed: ${SIGNAL}"
+    else
+        echo "Completed: ${SIGNAL}"
+    fi
+
+done

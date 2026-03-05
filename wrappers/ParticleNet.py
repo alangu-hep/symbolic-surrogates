@@ -18,9 +18,9 @@ class ParticleNetWrapper(torch.nn.Module):
 
 def get_model(data_config, **kwargs):
     conv_params = [
+        (16, (32, 32, 32)),
         (16, (64, 64, 64)),
         (16, (128, 128, 128)),
-        (16, (256, 256, 256)),
     ]
     fc_params = [(256, 0.1)]
 
