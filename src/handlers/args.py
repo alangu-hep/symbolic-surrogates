@@ -5,7 +5,7 @@ def setup_argparse():
     
     parser = argparse.ArgumentParser(conflict_handler='resolve')
 
-    parser.add_argument('--comp', type=str, default='DL', choices=['KD', 'DL', 'SDR', 'DR', 'SR', 'LOGITS'])
+    parser.add_argument('--comp', type=str, default='DL', choices=['KD', 'DL', 'SDR', 'DR', 'SR', 'LOGITS', 'HARDSR'])
 
     parser.add_argument('--data-train', nargs='*', default=[],
                         help='training files; supported syntax:'

@@ -15,3 +15,12 @@ class Surrogate(torch.nn.Module):
         signal_logit = self.signal(x).unsqueeze(1)
 
         return torch.cat([bkg_logit, signal_logit], axis=1)
+
+class HingeSurrogate(torch.nn.Module):
+    def __init__(self, modules):
+        super().__init__()
+
+        self.mod = modules
+
+    def forward(self, x):
+        return self.mod(x)

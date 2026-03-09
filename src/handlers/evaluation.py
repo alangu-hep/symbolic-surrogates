@@ -158,6 +158,7 @@ class ClassificationStats(ModelStats):
         fpr, tpr, auc = classification.roc_metrics(labels, preds)
         self.output_dict['classification']['tpr'] = tpr
         self.output_dict['classification']['fpr'] = fpr
+        self.output_dict['classification']['bkg_rejs'] = 1/fpr
         self.output_dict['classification']['roc_auc'].append(auc)
         self.output_dict['classification']['confusion_matrix'] = classification.confusion_matrices(labels, preds)
 
@@ -250,6 +251,69 @@ class KDStats(ModelStats):
         }
         return loss, extra_display
 
+class SurrogateComparisons(ModelStats):
+    def __init__(self, dl_model, loss, **kwargs):
+        super(KDStats, self).__init__(**kwargs)
+        teacher.eval()
+        self.dl_model = dl_model
+        self.base_loss = loss
+        
+    def extra_processing(self):
+        from scipy.special import softmax
+        self.output_dict['preds']['dl_probs'] = softmax(self.output_dict['preds']['dl_logits'], axis=-1)
+        self.output_dict['preds']['surrogate_probs'] = softmax(self.output_dict['preds']['surrogate_logits'], axis=-1)
+    def val_metrics(self):
+        labels = self.output_dict['preds']['labels']
+        preds = self.output_dict['preds']['surrogate_logits']
+        dl_logits = self.output_dict['preds']['dl_logits']
+        surrogate_logits = self.output_dict['preds']['surrogate_logits']
+        
+        cce, avg_accuracy = classification.accuracy_metrics(labels, preds)
+        self.output_dict['classification']['cce_loss'].append(cce)
+        self.output_dict['classification']['avg_accuracy'].append(avg_accuracy)
+
+        self.output_dict['faithfulness']['spearmanr'] = faithfulness.spearman(dl_logits, surrogate_logits)
+        self.output_dict['faithfulness']['spearmanr'].append(faithfulness.r2_score(dl_logits, surrogate_logits))
+        
+    def test_metrics(self):
+
+        self.val_metrics()
+        labels = self.output_dict['preds']['labels']
+        preds = self.output_dict['preds']['dl_probs']
+        teacher_preds = self.output_dict['preds']['teacher_probs']
+        
+        fpr, tpr, auc = classification.roc_metrics(labels, preds)
+        self.output_dict['classification']['tpr'] = tpr
+        self.output_dict['classification']['fpr'] = fpr
+        self.output_dict['classification']['roc_auc'].append(auc)
+        self.output_dict['classification']['confusion_matrix'] = classification.confusion_matrices(labels, preds)
+
+        self.output_dict['complexity']['num_params'].append(complexity.total_params(self.model)[0])
+    
+    def compute_loss(self, inputs, label, mask):
+        with torch.no_grad():
+            teacher_output = self.dl_model(*inputs)
+        student_output = self.model(*inputs)
+        
+        d_logits, d_label, _ = _flatten_preds(teacher_output, label=label, mask=mask)
+        s_logits, s_label, _ = _flatten_preds(student_output, label=label, mask=mask)
+        
+        loss = self.base_loss(s_logits, label)
+
+        _, preds = s_logits.max(1)
+        correct = (preds == label).sum().item()
+        num_examples = label.shape[0]
+
+        self.output_dict['preds']['surrogate_logits'].append(s_logits.detach())
+        self.output_dict['preds']['dl_logits'].append(d_logits.detach())
+
+        self.track_avg({'AvgAcc': (correct/num_examples)})
+
+        extra_display = {
+            'Acc': '%.5f' % (correct / num_examples),
+        }
+        return loss, extra_display
+
 class BVAEStats(ModelStats):
     def __init__(self, vae_loss, recon_loss, **kwargs):
         super(BVAEStats, self).__init__(**kwargs)
@@ -269,6 +333,13 @@ class BVAEStats(ModelStats):
         self.val_metrics()
         
         self.output_dict['complexity']['num_params'].append(complexity.total_params(self.model)[0])
+        self.output_dict['interpretability']['latent_traversals'] = interpretability.traversals(
+            self.model.mod,
+            self.output_dict['preds']['latents'],
+            self.output_dict['inputs']['mask'],
+            self.output_dict['preds']['labels'],
+            selection=range(self.model.mod.encoder.latent_dim*2)  
+        )
     
     def compute_loss(self, inputs, label, mask):
         reconstructed, mean, log_var, z = self.model(*inputs)
@@ -434,6 +505,37 @@ class SurrogateStats(ClassificationStats):
         self.track_avg({'Avg Accuracy': (correct/num_examples)})
         
         self.output_dict['preds']['logits'].append(logits.detach())
+
+        extra_display = {
+            'Acc': '%.5f' % (correct / num_examples)
+        }
+        return loss, extra_display
+
+class HingeSurrogateStats(ModelStats):
+    def __init__(self, dr, loss, **kwargs):
+        super(HingeSurrogateStats, self).__init__(**kwargs)
+        self.loss = loss
+        dr.eval()
+        self.dr = dr
+
+    def extra_processing(self):
+        print('not implemented yet')
+    def val_metrics(self):
+        print('not implemented yet')
+    def test_metrics(self):
+        print('not implemented yet')
+        
+    def compute_loss(self, inputs, label, mask):
+        reconstructed, mean, log_var, z = self.dr(*inputs)
+        label = torch.where(label == 0, -1, label)
+        model_output = self.model(torch.cat([mean, log_var], axis=1))
+        preds, labels, _ = _flatten_preds(model_output, label=label, mask=mask)
+        loss = self.loss(preds, label)
+
+        correct = (torch.sign(preds) == label).sum().item()
+        num_examples = label.shape[0]
+
+        self.track_avg({'Avg Accuracy': (correct/num_examples)})
 
         extra_display = {
             'Acc': '%.5f' % (correct / num_examples)

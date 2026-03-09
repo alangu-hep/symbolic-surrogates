@@ -559,7 +559,36 @@ def classifier_logits(args, loader_dict, model_dict):
     logit_dict = logit_tester.run()
 
     save_logits(args, logit_dict)
+
+def hard_labelsr(args, loader_dict, vae_dict):
+
+    dr = copy.deepcopy(vae_dict['model']).to(device)
+
+    model_trainer = sr_trainer.LabelSymbolicTrainer(dr, loader_dict['train'], device)
+    regressor = model_trainer.run(args)
+
+    _logger.info(str(regressor))
+    _logger.info('Regressor Params:' + str(regressor.get_params()))
+
+    modules = regressor.pytorch()
+    surrogate = surrogates.HingeSurrogate(modules)
+
+    loss_fn = torch.nn.HingeEmbeddingLoss()
+
+    model_tester = evaluation.HingeSurrogateStats(
+        dr=dr,
+        loss=loss_fn,
+        model=surrogate,
+        device=device,
+        loader=loader_dict['test'],
+        split='test'
+    )
     
+    _logger.info('Tester Initialized')
+    test_dict = model_tester.run()
+    dict_print = pformat(test_dict, indent=2)
+    _logger.info(f"Test Dict:\n{dict_print}")
+
 def main():
 
     args = setup_argparse().parse_args()
@@ -572,7 +601,7 @@ def main():
     loader_dict = assemble_loaders(args)
 
     start = time.time()
-    
+
     if args.comp == 'DL':
         _logger.info('Training Regular Classifier')
         model_dict = initialize_models(args, training=True, network=args.model_network)
@@ -601,7 +630,10 @@ def main():
         _logger.info('Fetching logits for model')
         model_dict = initialize_models(args, training=False, network=args.model_network, model_path=args.model_path)
         classifier_logits(args, loader_dict, model_dict)
-        
+    elif args.comp == 'HARDSR':
+        _logger.info('Performing Symbolic Regression w/o a DL Model')
+        vae_dict = initialize_models(args, training=True, network=args.dr_network, model_path=args.dr_path)
+        hard_labelsr(args, loader_dict, vae_dict)
 
     end = time.time()
     elapsed_time = end - start

@@ -12,7 +12,11 @@ def spearman(teacher_logits, student_logits):
         rho_values.append(rho)
         
     return rho_values
-        
+
+def r2_score(teacher_logits, student_logits):
+    from sklearn.metrics import r2_score 
+    return r2_score(teacher_logits, student_logits)
+    
 def kl_div(teacher_logits, student_logits):
 
     from scipy.special import softmax, kl_div
