@@ -27,6 +27,7 @@ import mplhep as mh
 plt.style.use(mh.style.CMS)
 
 from importlib.util import spec_from_file_location, module_from_spec
+from handlers.model_loader import import_module, initialize_models
 
 from weaver.utils.logger import _logger, warn_n_times, _configLogger
 import copy
@@ -34,22 +35,6 @@ from pprint import pformat
 import time
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-def import_module(path, name='_mod'):
-    pkg_root = os.path.dirname(os.path.abspath(path))
-    not_inserted = pkg_root not in sys.path
-    if not_inserted:
-        sys.path.insert(0, pkg_root)
-
-    spec = spec_from_file_location(name, path, 
-        submodule_search_locations=[]
-    )
-    mod = module_from_spec(spec)
-    mod.__package__ = name
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    sys.path.remove(pkg_root)
-    return mod
 
 def assemble_loaders(args):
 
@@ -68,23 +53,6 @@ def assemble_loaders(args):
         loaderdict['test'] = test_loaders
 
     return loaderdict
-
-def initialize_models(args, training, network, model_path=None):
-    
-    network_module = import_module(network, name='_network_module')
-    data_config = SimpleIterDataset({}, args.data_config, for_training=training).config
-    model, model_info = network_module.get_model(data_config)
-
-    if model_path is not None:
-        wts = torch.load(model_path, map_location = 'cpu', weights_only = True)
-        model.load_state_dict(wts)
-    
-    model_metadata = {
-        'model': model,
-        'info': model_info
-    }
-
-    return model_metadata
 
 def save_logits(args, metrics_dict):
 
@@ -604,35 +572,35 @@ def main():
 
     if args.comp == 'DL':
         _logger.info('Training Regular Classifier')
-        model_dict = initialize_models(args, training=True, network=args.model_network)
+        model_dict = initialize_models(args, training=True, network=args.model_network, data_config=args.data_config)
         classifier(args, loader_dict, model_dict)
     elif args.comp == 'KD':
         _logger.info(f'Performing DL Knowledge Distillation w/ teacher at path {args.teacher_path}')
         _logger.info(f'KD Temperature: {args.kd_temp}')
-        student_dict = initialize_models(args, training=True, network=args.model_network)
-        teacher_dict = initialize_models(args, training=True, network=args.teacher_network, model_path=args.teacher_path)
+        student_dict = initialize_models(args, training=True, network=args.model_network, data_config=args.data_config)
+        teacher_dict = initialize_models(args, training=True, network=args.teacher_network, data_config=args.data_config, model_path=args.teacher_path)
         knowledge_distillation(args, loader_dict, teacher_dict, student_dict)
     elif args.comp == 'SDR':
         _logger.info('Performing Supervised Dimensionality Reduction')
-        vae_dict = initialize_models(args, training=True, network=args.dr_network)
-        teacher_dict = initialize_models(args, training=True, network=args.model_network, model_path=args.model_path)
+        vae_dict = initialize_models(args, training=True, network=args.dr_network, data_config=args.data_config)
+        teacher_dict = initialize_models(args, training=True, network=args.model_network, data_config=args.data_config, model_path=args.model_path)
         svae(args, loader_dict, vae_dict, teacher_dict)
     elif args.comp == 'DR':
         _logger.info('Performing Dimensionality Reduction')
-        vae_dict = initialize_models(args, training=True, network=args.dr_network)
+        vae_dict = initialize_models(args, training=True, network=args.dr_network, data_config=args.data_config)
         vae(args, loader_dict, vae_dict)
     elif args.comp == 'SR':
         _logger.info('Performing Symbolic Regression')
-        vae_dict = initialize_models(args, training=True, network=args.dr_network, model_path=args.dr_path)
-        model_dict = initialize_models(args, training=True, network=args.model_network, model_path=args.model_path)
+        vae_dict = initialize_models(args, training=True, network=args.dr_network, data_config=args.data_config, model_path=args.dr_path)
+        model_dict = initialize_models(args, training=True, network=args.model_network, data_config=args.data_config, model_path=args.model_path)
         symbolic_regression(args, loader_dict, model_dict, vae_dict)
     elif args.comp == 'LOGITS':
         _logger.info('Fetching logits for model')
-        model_dict = initialize_models(args, training=False, network=args.model_network, model_path=args.model_path)
+        model_dict = initialize_models(args, training=False, network=args.model_network, data_config=args.data_config, model_path=args.model_path)
         classifier_logits(args, loader_dict, model_dict)
     elif args.comp == 'HARDSR':
         _logger.info('Performing Symbolic Regression w/o a DL Model')
-        vae_dict = initialize_models(args, training=True, network=args.dr_network, model_path=args.dr_path)
+        vae_dict = initialize_models(args, training=True, network=args.dr_network, data_config=args.data_config, model_path=args.dr_path)
         hard_labelsr(args, loader_dict, vae_dict)
 
     end = time.time()

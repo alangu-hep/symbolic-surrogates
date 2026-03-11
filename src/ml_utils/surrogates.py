@@ -26,36 +26,12 @@ class FullSurrogate(torch.nn.Module):
         _, mean, log_var, z = self.dr(points, features, lorentz_vectors, mask)
         return self.surrogate(torch.cat([mean, log_var], axis=1))
 
-def get_model(data_config, **kwargs):
-
-    cfg = dict(
-        input_dims=len(data_config.input_dicts['pf_features']),
-        set_size=data_config.input_shapes['pf_features'][-1],
-        phi_sizes=(256, 256, 256),
-        fc_sizes = (256, 256, 256),
-        use_bn=False,
-        latent_dim=8,
-        relaxed=True,
-        expander_relu=False,
-        n_pieces=20
-    )
-    cfg.update(**kwargs)
-    _logger.info('Model config: %s' % str(cfg))
-
-    model = AutoencoderWrapper(**cfg)
-
-    model_info = {
-        'input_names': list(data_config.input_names),
-        'input_shapes': {k: ((1,) + s[1:]) for k, s in data_config.input_shapes.items()}
-    }
-
-    return model, model_info
-
 class HingeSurrogate(torch.nn.Module):
-    def __init__(self, modules):
-        super().__init__()
+    def __init__(self, modules, dr):
+        super(HingeSurrogate, self).__init__()
+        self.dr = dr
+        self.surrogate = modules
 
-        self.mod = modules
-
-    def forward(self, x):
+    def forward(self, points, features, lorentz_vectors, mask):
+        _, mean, log_var, z = self.dr(points, features, lorentz_vectors, mask)
         return self.mod(x)

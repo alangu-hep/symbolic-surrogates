@@ -6,7 +6,7 @@ def spearman(teacher_logits, student_logits):
 
     rho_values = []
     
-    for i in range(teacher_logits.shape):
+    for i in range(teacher_logits.shape[-1]):
 
         rho = spearmanr(student_logits[:, i], teacher_logits[:, i]).statistic
         rho_values.append(rho)

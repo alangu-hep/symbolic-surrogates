@@ -10,6 +10,7 @@ import copy
 
 from weaver.utils.logger import _logger
 
+import sklearn
 from sklearn.base import BaseEstimator, RegressorMixin
 
 def latent_variances(latents):
@@ -35,6 +36,9 @@ def active_units(samples):
 class SymPyWrapper(BaseEstimator, RegressorMixin):
     def __init__(self, func):
         self.func = func
+        self.fitted_ = True
+        self._estimator_type = "regressor"
+        self.dummy_ = "dummy"
 
     def fit(self, X, y=None):
         return self
@@ -56,7 +60,7 @@ class EquationVisualizer:
         self.diff_eq = self.signal - self.bkg
         self.all_symbols = sorted(self.diff_eq.free_symbols, key=lambda s: s.name)
         self.diff = sympy.lambdify(self.all_symbols, self.diff_eq, 'numpy')
-        self.diff_model = SymPyWrapper(self.diff)
+        self.diff_model = SymPyWrapper(self.diff).fit(np.zeros((1, 1)), np.zeros(1))
 
         _logger.info(f'Background Equation: {self.bkg}')
         _logger.info(f'Signal Equation: {self.signal}')
@@ -69,6 +73,10 @@ class EquationVisualizer:
         self.latents = latents
 
     def pdp(self, var_idx, event=None):
+        from sklearn.inspection import PartialDependenceDisplay
+        sklearn.set_config(
+           assume_finite=True,  # disable validation
+        )
         if event =='signal':
             pdp = PartialDependenceDisplay.from_estimator(self.diff_model, self.sig_latents, features=[var_idx])
         elif event=='background':
