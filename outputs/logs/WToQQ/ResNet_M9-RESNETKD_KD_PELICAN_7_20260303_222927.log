@@ -1,0 +1,2324 @@
+[2026-03-04 01:48:57,501] INFO: Started!
+[2026-03-04 01:48:57,501] INFO: args:
+ - ('comp', 'KD')
+ - ('data_train', ['WToQQ:/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_*.root', 'ZJetsToNuNu:/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_*.root'])
+ - ('data_val', ['WToQQ:/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_*.root', 'ZJetsToNuNu:/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_*.root'])
+ - ('data_test', ['WToQQ:/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_*.root', 'ZJetsToNuNu:/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_*.root'])
+ - ('data_config', '/home/alang/ppCodes/part_gp/data_config/JetClass/JetClass_WToQQ.yaml')
+ - ('data_fraction', 0.1)
+ - ('file_fraction', 1.0)
+ - ('batch_size', 64)
+ - ('num_epochs', 5)
+ - ('num_workers', 0)
+ - ('optimizer', 'ranger')
+ - ('optimizer_option', [])
+ - ('start_lr', 0.001)
+ - ('final_lr', 0.001)
+ - ('lr_scheduler', 'flat+decay')
+ - ('model_network', '/home/alang/ppCodes/part_gp/wrappers/resnet.py')
+ - ('model_path', None)
+ - ('model_prefix', '/home/alang/ppCodes/part_gp/outputs/models/WToQQ/ResNet/ResNet_M9-RESNETKD_KD_PELICAN_7')
+ - ('log', '/home/alang/ppCodes/part_gp/outputs/logs/WToQQ/ResNet_M9-RESNETKD_KD_PELICAN_7_20260303_222927.log')
+ - ('metrics_prefix', '/home/alang/ppCodes/part_gp/outputs/metrics/WToQQ/ResNet_M9-RESNETKD_0.1.root')
+ - ('figures_prefix', '/home/alang/ppCodes/part_gp/figures/WToQQ/ResNet/ResNet_M9-RESNETKD_KD_PELICAN_7')
+ - ('teacher_network', '/home/alang/ppCodes/part_gp/wrappers/pelican_wrapper.py')
+ - ('teacher_path', '/home/alang/ppCodes/part_gp/outputs/models/WToQQ/PELICAN/PELICAN_M2-TEACHER_DL_epoch-4_state.pt')
+ - ('teacher_prefix', 'PELICAN')
+ - ('kd_temp', 7.0)
+ - ('kd_anneal', False)
+ - ('kd_weight', 1)
+ - ('dr_method', 'encoder')
+ - ('dr_network', None)
+ - ('dr_path', None)
+ - ('alpha', 1.0)
+ - ('beta', 4.0)
+ - ('gamma', 1.0)
+ - ('kl_anneal', False)
+ - ('svae_weight', 1.0)
+ - ('bit_size', None)
+ - ('sr_prefix', None)
+ - ('max_size', 40)
+ - ('n_iterations', 5600)
+ - ('n_populations', 48)
+ - ('population_size', 27)
+ - ('iteration_cycles', 1520)
+ - ('weight_optimize', 0.001)
+ - ('parsimony', 0.01)
+ - ('sr_loss', 'HuberLoss(1.35)')
+ - ('binary_operators', ['+', '-', '*', '/', '^'])
+ - ('unary_operators', ['sqrt', 'tanh', 'sin'])
+ - ('constraints', {'^': (-1, 1)})
+ - ('nested_constraints', {'*': {'tanh': 2}, 'tanh': {'tanh': 0, '^': 1, 'sin': 1}, 'sin': {'sin': 0}})
+ - ('sr_annealing', True)
+ - ('sr_batching', True)
+[2026-03-04 01:48:57,504] INFO: Using 200 files for training, range: (0, 1)
+[2026-03-04 01:48:57,504] INFO: Using 10 files for validation, range: (0, 1)
+[2026-03-04 01:48:57,509] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,509] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,509] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,509] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,509] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,509] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,509] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,509] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,510] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,510] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 01:48:57,510] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,514] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,514] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,514] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,514] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,514] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,514] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,515] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,515] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,515] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,515] INFO: [0;37mobserver_names: ()[0m
+[2026-03-04 01:48:57,515] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,519] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,519] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,519] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,519] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,519] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,519] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,519] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,519] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,519] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,520] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 01:48:57,520] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,524] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,524] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,524] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,524] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,524] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,524] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,524] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,524] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,524] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,524] INFO: [0;37mobserver_names: ()[0m
+[2026-03-04 01:48:57,524] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,529] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,529] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,529] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,529] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,529] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,529] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,530] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,530] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,530] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,530] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 01:48:57,530] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,534] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,534] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,534] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,534] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,534] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,534] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,534] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,534] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,534] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,534] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 01:48:57,534] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,535] INFO: Performing DL Knowledge Distillation w/ teacher at path /home/alang/ppCodes/part_gp/outputs/models/WToQQ/PELICAN/PELICAN_M2-TEACHER_DL_epoch-4_state.pt
+[2026-03-04 01:48:57,535] INFO: KD Temperature: 7.0
+[2026-03-04 01:48:57,539] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,539] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,539] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,540] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,540] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,540] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,540] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,540] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,540] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,540] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 01:48:57,540] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,544] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,545] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,545] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,545] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,545] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,545] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,545] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,545] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,545] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,545] INFO: [0;37mobserver_names: ()[0m
+[2026-03-04 01:48:57,545] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,639] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,639] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,639] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,639] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,639] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,639] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,639] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,639] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,640] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,640] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 01:48:57,640] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,644] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 01:48:57,644] INFO: [0;37mselection: None[0m
+[2026-03-04 01:48:57,644] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 01:48:57,644] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 01:48:57,644] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 01:48:57,644] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 01:48:57,644] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 01:48:57,645] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 01:48:57,645] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 01:48:57,645] INFO: [0;37mobserver_names: ()[0m
+[2026-03-04 01:48:57,645] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 01:48:57,645] INFO: Model config: {'rank1_dim_multiplier': 1, 'num_channels_scalar': 10, 'num_channels_m': [[60], [60], [60], [60], [60]], 'num_channels_2to2': [35, 35, 35, 35, 35], 'num_channels_out': [60], 'num_channels_m_out': [60, 35], 'stabilizer': 'so2', 'method': 'spurions', 'num_classes': 2, 'average_nobj': 32, 'drop_rate': 0.01, 'drop_rate_out': 0.01, 'dataset': '', 'config': 'M', 'config_out': 'M', 'scale': 0.1}
+[2026-03-04 01:48:57,930] INFO: Teacher Name: PELICAN
+[2026-03-04 01:48:57,930] INFO: Student Name: ResNet_M9-RESNETKD_KD_PELICAN_7
+[2026-03-04 01:48:57,930] INFO: Optimizer options: {}
+[2026-03-04 01:48:58,718] INFO: Trainer Initialized
+[2026-03-04 01:48:58,718] INFO: --------------------------------------------------
+[2026-03-04 01:48:58,718] INFO: Epoch #0 training
+[2026-03-04 01:48:58,720] INFO: Restarted DataIter train, load_range=(0.3830984020568403, 0.4830984020568403), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_099.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_099.root"
+  ]
+}
+[2026-03-04 02:25:11,924] INFO: Starting Validation for epoch 0
+[2026-03-04 02:25:11,925] INFO: Validator Initialized
+[2026-03-04 02:25:11,925] INFO: Starting!
+[2026-03-04 02:25:11,926] INFO: Restarted DataIter val, load_range=(0.4123812424463769, 0.512381242446377), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_124.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_124.root"
+  ]
+}
+[2026-03-04 02:26:25,207] INFO: Commencing Model Validation
+[2026-03-04 02:26:25,278] INFO: Val Dict:
+{ 'classification': defaultdict(<class 'list'>,
+                                { 'avg_accuracy': [0.8777108674775929],
+                                  'cce_loss': [0.2917244383520045]}),
+  'complexity': defaultdict(<class 'list'>, {}),
+  'faithfulness': defaultdict(<class 'list'>,
+                              { 'kl_div': [0.03235987908708912]}),
+  'inputs': defaultdict(<class 'list'>, {}),
+  'interpretability': defaultdict(<class 'list'>, {}),
+  'preds': defaultdict(<class 'list'>,
+                       { 'dl_logits': array([[-1.8934271 ,  2.4588625 ],
+       [-0.48831457,  0.49082822],
+       [-2.4672933 ,  3.1384041 ],
+       ...,
+       [ 0.718862  , -0.8669093 ],
+       [-0.78975177,  0.9254837 ],
+       [-1.7242615 ,  2.2993405 ]], dtype=float32),
+                         'dl_probs': array([[0.01271358, 0.9872864 ],
+       [0.2730619 , 0.72693807],
+       [0.00366338, 0.9963366 ],
+       ...,
+       [0.8300203 , 0.16997966],
+       [0.15248586, 0.8475141 ],
+       [0.01757404, 0.9824259 ]], dtype=float32),
+                         'labels': array([1, 1, 1, ..., 0, 1, 1]),
+                         'teacher_logits': array([[ 1.39666587e-01,  1.54807091e+00],
+       [-1.37354771e-03,  1.80087817e+00],
+       [-1.33205205e-02,  5.02406502e+00],
+       ...,
+       [ 2.11792016e+00,  4.81963307e-02],
+       [-4.11221664e-03,  2.88139701e+00],
+       [-1.07261045e-02,  4.28789234e+00]], dtype=float32),
+                         'teacher_probs': array([[0.19648586, 0.8035141 ],
+       [0.14157718, 0.8584228 ],
+       [0.00644884, 0.99355114],
+       ...,
+       [0.8879255 , 0.11207452],
+       [0.05287456, 0.9471255 ],
+       [0.01340518, 0.9865948 ]], dtype=float32)}),
+  'robustness': defaultdict(<class 'list'>, {})}
+[2026-03-04 02:26:25,279] INFO: --------------------------------------------------
+[2026-03-04 02:26:25,279] INFO: Epoch #1 training
+[2026-03-04 02:26:25,280] INFO: Restarted DataIter train, load_range=(0.01616148198116404, 0.11616148198116405), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_099.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_099.root"
+  ]
+}
+[2026-03-04 03:02:08,540] INFO: Starting Validation for epoch 1
+[2026-03-04 03:02:08,541] INFO: Validator Initialized
+[2026-03-04 03:02:08,541] INFO: Starting!
+[2026-03-04 03:02:08,542] INFO: Restarted DataIter val, load_range=(0.7859208878097143, 0.8859208878097142), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_124.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_124.root"
+  ]
+}
+[2026-03-04 03:03:21,907] INFO: Commencing Model Validation
+[2026-03-04 03:03:21,933] INFO: Val Dict:
+{ 'classification': defaultdict(<class 'list'>,
+                                { 'avg_accuracy': [0.8815220870678617],
+                                  'cce_loss': [0.28264530226519474]}),
+  'complexity': defaultdict(<class 'list'>, {}),
+  'faithfulness': defaultdict(<class 'list'>,
+                              { 'kl_div': [0.027534265066383744]}),
+  'inputs': defaultdict(<class 'list'>, {}),
+  'interpretability': defaultdict(<class 'list'>, {}),
+  'preds': defaultdict(<class 'list'>,
+                       { 'dl_logits': array([[ 1.2023749 , -1.1208019 ],
+       [ 1.6809726 , -1.7675513 ],
+       [-0.70723903,  0.6777301 ],
+       ...,
+       [ 1.7119187 , -2.0273914 ],
+       [-0.10048218,  0.30195698],
+       [-0.1783734 ,  0.05961875]], dtype=float32),
+                         'dl_probs': array([[0.9107784 , 0.08922156],
+       [0.9691871 , 0.03081291],
+       [0.20021214, 0.7997879 ],
+       ...,
+       [0.9767815 , 0.02321857],
+       [0.40072644, 0.59927356],
+       [0.4407812 , 0.5592188 ]], dtype=float32),
+                         'labels': array([0, 0, 1, ..., 0, 0, 0]),
+                         'teacher_logits': array([[ 3.1288698e+00, -9.3849347e-04],
+       [ 2.7487359e+00,  4.5325883e-02],
+       [-1.7190439e-03,  2.3922176e+00],
+       ...,
+       [ 5.2897720e+00, -3.2281992e-03],
+       [ 3.5931638e-01,  7.0154756e-01],
+       [ 6.1348945e-01,  7.5420719e-01]], dtype=float32),
+                         'teacher_probs': array([[0.9581057 , 0.04189431],
+       [0.9372275 , 0.06277244],
+       [0.08363622, 0.9163637 ],
+       ...,
+       [0.99499846, 0.00500152],
+       [0.4152676 , 0.5847325 ],
+       [0.4648785 , 0.53512156]], dtype=float32)}),
+  'robustness': defaultdict(<class 'list'>, {})}
+[2026-03-04 03:03:21,934] INFO: --------------------------------------------------
+[2026-03-04 03:03:21,934] INFO: Epoch #2 training
+[2026-03-04 03:03:21,935] INFO: Restarted DataIter train, load_range=(0.8123623167508291, 0.9123623167508291), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_099.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_099.root"
+  ]
+}
+[2026-03-04 03:38:58,197] INFO: Starting Validation for epoch 2
+[2026-03-04 03:38:58,197] INFO: Validator Initialized
+[2026-03-04 03:38:58,197] INFO: Starting!
+[2026-03-04 03:38:58,199] INFO: Restarted DataIter val, load_range=(0.08403623440493604, 0.18403623440493605), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_124.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_124.root"
+  ]
+}
+[2026-03-04 03:40:12,342] INFO: Commencing Model Validation
+[2026-03-04 03:40:12,369] INFO: Val Dict:
+{ 'classification': defaultdict(<class 'list'>,
+                                { 'avg_accuracy': [0.8804717509603073],
+                                  'cce_loss': [0.28332150839050874]}),
+  'complexity': defaultdict(<class 'list'>, {}),
+  'faithfulness': defaultdict(<class 'list'>,
+                              { 'kl_div': [0.025538816952674855]}),
+  'inputs': defaultdict(<class 'list'>, {}),
+  'interpretability': defaultdict(<class 'list'>, {}),
+  'preds': defaultdict(<class 'list'>,
+                       { 'dl_logits': array([[ 2.0868013 , -2.855674  ],
+       [-0.24547094,  0.41290498],
+       [ 2.4224532 , -3.262981  ],
+       ...,
+       [-1.4417111 ,  1.5842668 ],
+       [-2.227364  ,  2.3186734 ],
+       [-1.9738399 ,  2.163632  ]], dtype=float32),
+                         'dl_probs': array([[0.99291366, 0.00708634],
+       [0.3411045 , 0.6588955 ],
+       [0.9966164 , 0.00338357],
+       ...,
+       [0.04626598, 0.95373404],
+       [0.01049779, 0.98950225],
+       [0.01571234, 0.9842876 ]], dtype=float32),
+                         'labels': array([0, 1, 0, ..., 1, 1, 1]),
+                         'teacher_logits': array([[ 4.2599673e+00, -3.4069966e-03],
+       [ 9.6086144e-01,  2.1505857e-02],
+       [ 6.0032239e+00, -7.8008058e-03],
+       ...,
+       [-6.7545474e-03,  3.3838065e+00],
+       [-1.2417739e-02,  5.3175988e+00],
+       [-1.1010353e-02,  4.3871560e+00]], dtype=float32),
+                         'teacher_probs': array([[0.98612064, 0.01387938],
+       [0.71896946, 0.28103054],
+       [0.9975545 , 0.00244558],
+       ...,
+       [0.03259176, 0.96740824],
+       [0.00482064, 0.9951794 ],
+       [0.01215043, 0.98784953]], dtype=float32)}),
+  'robustness': defaultdict(<class 'list'>, {})}
+[2026-03-04 03:40:12,369] INFO: --------------------------------------------------
+[2026-03-04 03:40:12,369] INFO: Epoch #3 training
+[2026-03-04 03:40:12,370] INFO: Restarted DataIter train, load_range=(0.21092077792029787, 0.3109207779202979), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_099.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_099.root"
+  ]
+}
+[2026-03-04 04:15:42,342] INFO: Starting Validation for epoch 3
+[2026-03-04 04:15:42,343] INFO: Validator Initialized
+[2026-03-04 04:15:42,343] INFO: Starting!
+[2026-03-04 04:15:42,344] INFO: Restarted DataIter val, load_range=(0.4840492883334262, 0.5840492883334262), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_124.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_124.root"
+  ]
+}
+[2026-03-04 04:16:56,891] INFO: Commencing Model Validation
+[2026-03-04 04:16:56,918] INFO: Val Dict:
+{ 'classification': defaultdict(<class 'list'>,
+                                { 'avg_accuracy': [0.8844630281690141],
+                                  'cce_loss': [0.2794264806941818]}),
+  'complexity': defaultdict(<class 'list'>, {}),
+  'faithfulness': defaultdict(<class 'list'>,
+                              { 'kl_div': [0.031017362079302876]}),
+  'inputs': defaultdict(<class 'list'>, {}),
+  'interpretability': defaultdict(<class 'list'>, {}),
+  'preds': defaultdict(<class 'list'>,
+                       { 'dl_logits': array([[-1.9377098 ,  1.6208525 ],
+       [ 0.7320752 , -1.1658962 ],
+       [-1.9862286 ,  1.6990703 ],
+       ...,
+       [ 0.16900569, -0.48932114],
+       [ 0.66532254, -1.1672453 ],
+       [ 0.79779947, -1.3091811 ]], dtype=float32),
+                         'dl_probs': array([[0.02769111, 0.97230893],
+       [0.8696618 , 0.13033825],
+       [0.02447559, 0.9755245 ],
+       ...,
+       [0.6588844 , 0.34111553],
+       [0.8620673 , 0.13793266],
+       [0.8915798 , 0.1084202 ]], dtype=float32),
+                         'labels': array([1, 0, 1, ..., 0, 0, 0]),
+                         'teacher_logits': array([[-7.4275723e-03,  2.9180706e+00],
+       [ 1.2125479e+00,  4.0917510e-01],
+       [-8.9408774e-03,  4.2314811e+00],
+       ...,
+       [ 9.7543687e-01,  3.0171803e-01],
+       [ 1.7425570e+00,  3.4238629e-02],
+       [ 1.3569340e+00, -8.6022759e-05]], dtype=float32),
+                         'teacher_probs': array([[0.0509074 , 0.94909257],
+       [0.6906955 , 0.3093045 ],
+       [0.01419706, 0.9858029 ],
+       ...,
+       [0.66233534, 0.33766463],
+       [0.846618  , 0.15338193],
+       [0.795275  , 0.20472504]], dtype=float32)}),
+  'robustness': defaultdict(<class 'list'>, {})}
+[2026-03-04 04:16:56,918] INFO: --------------------------------------------------
+[2026-03-04 04:16:56,918] INFO: Epoch #4 training
+[2026-03-04 04:16:56,919] INFO: Restarted DataIter train, load_range=(0.09185193062930713, 0.19185193062930714), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_099.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_099.root"
+  ]
+}
+[2026-03-04 04:52:34,735] INFO: Starting Validation for epoch 4
+[2026-03-04 04:52:34,736] INFO: Validator Initialized
+[2026-03-04 04:52:34,736] INFO: Starting!
+[2026-03-04 04:52:34,739] INFO: Restarted DataIter val, load_range=(0.39279263549026466, 0.49279263549026464), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/WToQQ_124.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_120.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_121.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_122.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_123.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/val_5M/ZJetsToNuNu_124.root"
+  ]
+}
+[2026-03-04 04:53:48,812] INFO: Commencing Model Validation
+[2026-03-04 04:53:48,840] INFO: Val Dict:
+{ 'classification': defaultdict(<class 'list'>,
+                                { 'avg_accuracy': [0.8837728072983355],
+                                  'cce_loss': [0.27870703741199104]}),
+  'complexity': defaultdict(<class 'list'>, {}),
+  'faithfulness': defaultdict(<class 'list'>,
+                              { 'kl_div': [0.025106105242740175]}),
+  'inputs': defaultdict(<class 'list'>, {}),
+  'interpretability': defaultdict(<class 'list'>, {}),
+  'preds': defaultdict(<class 'list'>,
+                       { 'dl_logits': array([[-0.24687424,  0.20590381],
+       [ 1.8853511 , -2.3582356 ],
+       [ 0.54930216, -0.8442702 ],
+       ...,
+       [ 2.150739  , -2.854212  ],
+       [ 1.2712995 , -1.7542853 ],
+       [ 1.024775  , -1.4842643 ]], dtype=float32),
+                         'dl_probs': array([[0.38870043, 0.6112995 ],
+       [0.9858472 , 0.01415283],
+       [0.80116194, 0.19883807],
+       ...,
+       [0.99333996, 0.00666002],
+       [0.9537167 , 0.04628333],
+       [0.92477304, 0.07522691]], dtype=float32),
+                         'labels': array([1, 0, 0, ..., 0, 1, 0]),
+                         'teacher_logits': array([[-3.7492035e-04,  1.6060007e+00],
+       [ 4.4297318e+00, -4.5501259e-03],
+       [ 1.7205579e+00,  1.7944406e-01],
+       ...,
+       [ 5.1179428e+00, -6.5315124e-03],
+       [ 2.7070282e+00, -1.2318433e-03],
+       [ 3.3204050e+00, -1.9222129e-03]], dtype=float32),
+                         'teacher_probs': array([[0.16709243, 0.8329076 ],
+       [0.9882755 , 0.01172449],
+       [0.8236266 , 0.1763734 ],
+       ...,
+       [0.9940858 , 0.00591416],
+       [0.93751234, 0.06248771],
+       [0.9651869 , 0.03481313]], dtype=float32)}),
+  'robustness': defaultdict(<class 'list'>, {})}
+[2026-03-04 04:53:48,841] INFO: Testing Model
+[2026-03-04 04:53:48,841] INFO: Running on test file group WToQQ with 20 files:
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_100.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_101.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_102.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_103.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_104.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_105.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_106.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_107.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_108.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_109.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_110.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_111.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_112.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_113.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_114.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_115.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_116.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_117.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_118.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_119.root
+[2026-03-04 04:53:48,851] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 04:53:48,851] INFO: [0;37mselection: None[0m
+[2026-03-04 04:53:48,851] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 04:53:48,851] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 04:53:48,851] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 04:53:48,851] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 04:53:48,851] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 04:53:48,851] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 04:53:48,851] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 04:53:48,851] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 04:53:48,852] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 04:53:48,856] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 04:53:48,856] INFO: [0;37mselection: None[0m
+[2026-03-04 04:53:48,856] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 04:53:48,856] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 04:53:48,856] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 04:53:48,856] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 04:53:48,857] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 04:53:48,857] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 04:53:48,857] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 04:53:48,857] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 04:53:48,857] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 04:53:48,858] INFO: Running on test file group ZJetsToNuNu with 20 files:
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_100.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_101.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_102.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_103.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_104.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_105.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_106.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_107.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_108.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_109.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_110.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_111.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_112.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_113.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_114.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_115.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_116.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_117.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_118.root
+.../home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_119.root
+[2026-03-04 04:53:48,862] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 04:53:48,862] INFO: [0;37mselection: None[0m
+[2026-03-04 04:53:48,862] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 04:53:48,862] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 04:53:48,862] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 04:53:48,863] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 04:53:48,863] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 04:53:48,863] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 04:53:48,863] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 04:53:48,863] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 04:53:48,863] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 04:53:48,867] INFO: [0;37mpreprocess config: {'method': 'manual', 'data_fraction': 0.5, 'params': None}[0m
+[2026-03-04 04:53:48,867] INFO: [0;37mselection: None[0m
+[2026-03-04 04:53:48,867] INFO: [0;37mtest_time_selection: None[0m
+[2026-03-04 04:53:48,867] INFO: [0;37mvar_funcs:
+ - ('part_mask', 'ak.ones_like(part_energy)')
+ - ('part_pt', 'np.hypot(part_px, part_py)')
+ - ('part_pt_log', 'np.log(part_pt)')
+ - ('part_e_log', 'np.log(part_energy)')
+ - ('part_logptrel', 'np.log(part_pt/jet_pt)')
+ - ('part_logerel', 'np.log(part_energy/jet_energy)')
+ - ('part_deltaR', 'np.hypot(part_deta, part_dphi)')
+ - ('_label_', 'np.argmax(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')
+ - ('_labelcheck_', 'np.sum(np.stack([ak.to_numpy(label_QCD),ak.to_numpy(label_Wqq)], axis=1), axis=1)')[0m
+[2026-03-04 04:53:48,867] INFO: [0;37minput_names: ('pf_points', 'pf_features', 'pf_vectors', 'pf_mask')[0m
+[2026-03-04 04:53:48,868] INFO: [0;37minput_dicts:
+ - ('pf_points', ['part_deta', 'part_dphi'])
+ - ('pf_features', ['part_pt_log', 'part_e_log', 'part_logptrel', 'part_logerel', 'part_deltaR', 'part_deta', 'part_dphi'])
+ - ('pf_vectors', ['part_px', 'part_py', 'part_pz', 'part_energy'])
+ - ('pf_mask', ['part_mask'])[0m
+[2026-03-04 04:53:48,868] INFO: [0;37minput_shapes:
+ - ('pf_points', (-1, 2, 32))
+ - ('pf_features', (-1, 7, 32))
+ - ('pf_vectors', (-1, 4, 32))
+ - ('pf_mask', (-1, 1, 32))[0m
+[2026-03-04 04:53:48,868] INFO: [0;37mpreprocess_params:
+ - ('part_deta', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_dphi', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pt_log', {'length': 32, 'pad_mode': 'wrap', 'center': 1.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_e_log', {'length': 32, 'pad_mode': 'wrap', 'center': 2.0, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logptrel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_logerel', {'length': 32, 'pad_mode': 'wrap', 'center': -4.7, 'scale': 0.7, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_deltaR', {'length': 32, 'pad_mode': 'wrap', 'center': 0.2, 'scale': 4.0, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_px', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_py', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_pz', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_energy', {'length': 32, 'pad_mode': 'wrap', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})
+ - ('part_mask', {'length': 32, 'pad_mode': 'constant', 'center': None, 'scale': 1, 'min': -5, 'max': 5, 'pad_value': 0})[0m
+[2026-03-04 04:53:48,868] INFO: [0;37mlabel_names: ('_label_',)[0m
+[2026-03-04 04:53:48,868] INFO: [0;37mobserver_names: ('jet_pt', 'jet_eta', 'jet_phi', 'jet_energy', 'jet_nparticles', 'jet_sdmass', 'jet_tau1', 'jet_tau2', 'jet_tau3', 'jet_tau4')[0m
+[2026-03-04 04:53:48,868] INFO: [0;37mmonitor_variables: ()[0m
+[2026-03-04 04:53:48,869] INFO: Tester Initialized
+[2026-03-04 04:53:48,869] INFO: Starting!
+[2026-03-04 04:53:48,870] INFO: Restarted DataIter test_WToQQ, load_range=(0, 0.1), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_100.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_101.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_102.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_103.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_104.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_105.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_106.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_107.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_108.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_109.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_110.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_111.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_112.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_113.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_114.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_115.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_116.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_117.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_118.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/WToQQ_119.root"
+  ]
+}
+[2026-03-04 04:58:17,753] INFO: Restarted DataIter test_ZJetsToNuNu, load_range=(0, 0.1), file_list:
+{
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_100.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_101.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_102.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_103.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_104.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_105.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_106.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_107.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_108.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_109.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_110.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_111.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_112.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_113.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_114.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_115.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_116.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_117.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_118.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/test_20M/ZJetsToNuNu_119.root"
+  ]
+}
+[2026-03-04 05:02:48,585] INFO: Commencing Model Testing
+[2026-03-04 05:02:48,804] INFO: Test Dict:
+{ 'classification': defaultdict(<class 'list'>,
+                                { 'avg_accuracy': [0.8835775],
+                                  'cce_loss': [0.2773588350824326],
+                                  'confusion_matrix': array([[176157,  23843],
+       [ 22726, 177274]]),
+                                  'fpr': array([0.      , 0.      , 0.      , ..., 0.991515, 0.991525, 1.      ]),
+                                  'roc_auc': [0.9532419426875],
+                                  'tpr': array([0.00e+00, 5.00e-06, 1.45e-04, ..., 1.00e+00, 1.00e+00, 1.00e+00])}),
+  'complexity': defaultdict(<class 'list'>, {'num_params': [88720]}),
+  'faithfulness': defaultdict(<class 'list'>, {'kl_div': [0.02495302734375]}),
+  'inputs': defaultdict(<class 'list'>, {}),
+  'interpretability': defaultdict(<class 'list'>, {}),
+  'preds': defaultdict(<class 'list'>,
+                       { 'dl_logits': array([[ 1.2647319 , -1.8012516 ],
+       [-0.9293794 ,  0.60483485],
+       [-2.0296674 ,  1.5126367 ],
+       ...,
+       [ 1.1077969 , -1.5091383 ],
+       [ 0.8044431 , -1.267867  ],
+       [ 1.700092  , -2.1654832 ]], dtype=float32),
+                         'dl_probs': array([[0.9554676 , 0.04453241],
+       [0.17737792, 0.82262206],
+       [0.02813223, 0.9718678 ],
+       ...,
+       [0.9319436 , 0.06805642],
+       [0.8881826 , 0.11181742],
+       [0.979479  , 0.02052093]], dtype=float32),
+                         'labels': array([1, 1, 1, ..., 0, 0, 0]),
+                         'teacher_logits': array([[ 1.9756209e+00,  1.7339244e-01],
+       [-7.1044713e-05,  1.5963047e+00],
+       [-5.9059281e-03,  3.5522394e+00],
+       ...,
+       [ 2.3394351e+00,  4.0946662e-02],
+       [ 1.3955609e+00,  3.6023617e-01],
+       [ 5.1126032e+00, -4.5100101e-03]], dtype=float32),
+                         'teacher_probs': array([[0.85842   , 0.14158002],
+       [0.16848877, 0.83151126],
+       [0.02770234, 0.97229767],
+       ...,
+       [0.9087518 , 0.09124823],
+       [0.7379469 , 0.2620531 ],
+       [0.99404246, 0.00595759]], dtype=float32)}),
+  'robustness': defaultdict(<class 'list'>, {})}
+[2026-03-04 05:02:48,804] INFO: Re-evaluating for training set logits
+[2026-03-04 05:02:48,805] INFO: Train Set Tester Initialized
+[2026-03-04 05:02:48,805] INFO: Starting!
+[2026-03-04 05:02:48,806] INFO: Restarted DataIter train, load_range=(0.4131364320218781, 0.5131364320218781), file_list:
+{
+  "WToQQ": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/WToQQ_099.root"
+  ],
+  "ZJetsToNuNu": [
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_000.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_001.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_002.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_003.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_004.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_005.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_006.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_007.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_008.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_009.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_010.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_011.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_012.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_013.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_014.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_015.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_016.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_017.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_018.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_019.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_020.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_021.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_022.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_023.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_024.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_025.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_026.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_027.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_028.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_029.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_030.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_031.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_032.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_033.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_034.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_035.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_036.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_037.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_038.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_039.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_040.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_041.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_042.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_043.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_044.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_045.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_046.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_047.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_048.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_049.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_050.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_051.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_052.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_053.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_054.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_055.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_056.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_057.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_058.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_059.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_060.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_061.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_062.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_063.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_064.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_065.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_066.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_067.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_068.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_069.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_070.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_071.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_072.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_073.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_074.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_075.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_076.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_077.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_078.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_079.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_080.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_081.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_082.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_083.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_084.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_085.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_086.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_087.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_088.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_089.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_090.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_091.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_092.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_093.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_094.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_095.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_096.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_097.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_098.root",
+    "/home/alang/ppCodes/part_gp/datasets/JetClass/Pythia/train_100M/ZJetsToNuNu_099.root"
+  ]
+}
+[2026-03-04 05:07:53,141] INFO: Commencing Model Testing
+[2026-03-04 05:07:56,726] INFO: Elapsed time: 11939.19 seconds
