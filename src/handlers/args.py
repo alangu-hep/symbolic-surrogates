@@ -43,33 +43,30 @@ def setup_argparse():
     parser.add_argument('--model-prefix', type=str, default = None)
 
     parser.add_argument('--log', type=str, default=None)
-    parser.add_argument('--metrics-prefix', type=str, default=None)
-    parser.add_argument('--figures-prefix', type=str, default=None)
+    parser.add_argument('--run-prefix', type=str, default=None)
 
-# Knowledge Distillation
-    
-    parser.add_argument('--teacher-network', type=str, default = None)
-    parser.add_argument('--teacher-path', type=str, default = None)
-    parser.add_argument('--teacher-prefix', type=str, default = None)
-    parser.add_argument('--kd-temp', type=float, default=1)
-    parser.add_argument('--kd-anneal', action='store_true', default=False)
-    parser.add_argument('--kd-weight', type=float, default=1)
+    parser.add_argument('--for-training', action='store_true')
+
+# Model Names
+
+    parser.add_argument('--dl-name', type=str, default=None)
+    parser.add_argument('--vae-name', type=str, default=None)
+    parser.add_argument('--surrogate-name', type=str, default=None)
+    parser.add_argument('--observable-name', type=str, default=None)
 
 # Dimensionality Reduction
     
     parser.add_argument('--dr-method', type=str, default='encoder', help = 'Available Options: encoder')
     parser.add_argument('--dr-network', type=str, default=None)
     parser.add_argument('--dr-path', type=str, default=None)
-    parser.add_argument('--alpha', type=float, default=1.0)
     parser.add_argument('--beta', type=float, default=4.0)
-    parser.add_argument('--gamma', type=float, default=1.0)
     parser.add_argument('--kl-anneal', action='store_true', default=False)
-    parser.add_argument('--svae-weight', type=float, default=1.0)
     parser.add_argument('--bit-size', type=float, default=None)
 
 # Symbolic Regression
 
-    parser.add_argument('--sr-prefix', type=str, default=None)
+    parser.add_argument('--surrogate-prefix', type=str, default=None)
+    parser.add_argument('--observable-prefix', type=str, default=None)
     
     parser.add_argument('--max-size', type=int, default=40)
     parser.add_argument('--n-iterations', type=int, default=5600)
@@ -103,6 +100,8 @@ def setup_argparse():
     })
 
     parser.add_argument('--sr-annealing', action='store_true', default = True)
-    parser.add_argument('--sr-batching', action='store_true', default=True)
+    parser.add_argument('--sr-batching', action='store_true', default = True)
+    parser.add_argument('--surrogate-fraction', type=float, default=0.1, help = 'Fraction of train data used for surrogate SR')
+    parser.add_argument('--feature-fraction', type=float, default=0.01, help = 'Fraction of train data used for observable SR')
     
     return parser

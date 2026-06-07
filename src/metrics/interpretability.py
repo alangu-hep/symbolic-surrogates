@@ -48,78 +48,55 @@ class SymPyWrapper(BaseEstimator, RegressorMixin):
 
 
 class EquationVisualizer:
-    def __init__(self, eq_list, latents: np.ndarray, labels: np.ndarray):
+    def __init__(self, model, inputs: torch.Tensor, labels: torch.Tensor):
         '''
         Create visualizations for SymPy symbolic expressions based on the diff between logits
         '''
 
-        self.eq_list = eq_list
-        self.bkg = eq_list[0]
-        self.signal = eq_list[1]
-
-        self.diff_eq = self.signal - self.bkg
-        self.all_symbols = sorted(self.diff_eq.free_symbols, key=lambda s: s.name)
-        self.diff = sympy.lambdify(self.all_symbols, self.diff_eq, 'numpy')
-        self.diff_model = SymPyWrapper(self.diff).fit(np.zeros((1, 1)), np.zeros(1))
-
-        _logger.info(f'Background Equation: {self.bkg}')
-        _logger.info(f'Signal Equation: {self.signal}')
-        _logger.info(f'Difference Equation: {self.diff_eq}')
+        self.model = model
+        self.inputs = inputs.requires_grad_()
 
         bkg_indices = np.where(labels == 0)[0]
         sig_indices = np.where(labels == 1)[0]
-        self.sig_latents = latents[sig_indices]
-        self.bkg_latents = latents[bkg_indices]
-        self.latents = latents
+        self.sig_inputs = self.inputs[sig_indices]
+        self.bkg_inputs = self.inputs[bkg_indices]
 
-    def pdp(self, var_idx, event=None):
-        from sklearn.inspection import PartialDependenceDisplay
-        sklearn.set_config(
-           assume_finite=True,  # disable validation
-        )
-        if event =='signal':
-            pdp = PartialDependenceDisplay.from_estimator(self.diff_model, self.sig_latents, features=[var_idx])
-        elif event=='background':
-            pdp = PartialDependenceDisplay.from_estimator(self.diff_model, self.bkg_latents, features=[var_idx])
+        self.data_points = defaultdict(lambda: {"bkg": [], "sig": [], "none": []})
+
+    def pdp(self, idx, segments, order, event=None):
+        if event == 'sig':
+            input_tensor = self.sig_inputs
+        elif event == 'bkg':
+            input_tensor = self.bkg_inputs
+        elif event == 'none':
+            input_tensor = self.inputs
         else:
-            pdp = PartialDependenceDisplay.from_estimator(self.diff_model, self.latents, features=[var_idx])
-        return pdp
+            print('Need Valid Event!')
+            return
 
-class HingeEquationVisualizer:
-    def __init__(self, equation, latents: np.ndarray, labels: np.ndarray):
-        '''
-        Create visualizations for SymPy symbolic expressions based on the diff between logits
-        '''
+        max_val = torch.max(input_tensor[idx])
+        min_val = torch.min(input_tensor[idx])
 
-        self.diff_eq = equation
+        for val in torch.linspace(min_val, max_val, segments):
+            pdp_tensor = input_tensor.mean(dim=1).unsqueeze(0)
+            pdp_tensor[:, idx] = val
+            model_output = self.model(pdp_tensor)
+            logit_diff = model_output[:, 1] - model_output[:, 0]
 
-        self.all_symbols = sorted(self.diff_eq.free_symbols, key=lambda s: s.name)
-        self.diff = sympy.lambdify(self.all_symbols, self.diff_eq, 'numpy')
-        self.diff_model = SymPyWrapper(self.diff)
+            for _ in range(order):
+                logit_diff = torch.autograd.grad(logit_diff, pdp_tensor, create_graph=True, retain_graph=True)[0][idx]
 
-        _logger.info(f'Background Equation: {self.bkg}')
-        _logger.info(f'Signal Equation: {self.signal}')
-        _logger.info(f'Difference Equation: {self.diff_eq}')
+            self.data_points[f'dim_{idx}'][event].append([val.item(), logit_diff.detach().cpu().item()])
 
-        bkg_indices = np.where(labels == 0)[0]
-        sig_indices = np.where(labels == 1)[0]
-        self.sig_latents = latents[sig_indices]
-        self.bkg_latents = latents[bkg_indices]
-        self.latents = latents
+        return self.data_points
 
-    def pdp(self, var_idx, event=None):
-        if event =='signal':
-            pdp = PartialDependenceDisplay.from_estimator(self.diff_model, self.sig_latents, features=[var_idx])
-        elif event=='background':
-            pdp = PartialDependenceDisplay.from_estimator(self.diff_model, self.bkg_latents, features=[var_idx])
-        else:
-            pdp = PartialDependenceDisplay.from_estimator(self.diff_model, self.latents, features=[var_idx])
-        return pdp
 
-def reparametrize(latent_vector, autoencoder):
+def reparametrize(latent_vector, autoencoder, mean_only=True):
     latent_dim = autoencoder.encoder.latent_dim
     mean = latent_vector[:, :latent_dim]
     log_var = latent_vector[:, latent_dim:]
+    if mean_only:
+        return mean
     return autoencoder.reparametrize(mean, log_var)
 
 def traversals(autoencoder: torch.nn.Module, latents: np.ndarray, mask, labels: np.ndarray,

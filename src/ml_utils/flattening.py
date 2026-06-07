@@ -1,4 +1,3 @@
-
 import torch
 
 def _flatten_label(label, mask=None):

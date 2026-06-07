@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import math
 
-class BaseLoss(nn.Module):
+class Loss(nn.Module):
     def __init__(self, weight = 1.0, annealer = None):
-        super(BaseLoss, self).__init__()
+        super(Loss, self).__init__()
         self.weight = weight
         self.annealer = annealer
 
@@ -16,45 +16,46 @@ class BaseLoss(nn.Module):
             wt = self.weight
         return wt * loss_tensor
 
-class HuberLoss(BaseLoss):
+    def forward(self, inputs, label, mask, observers, *args):
+        ...
+
+'''
+class HuberLoss(Loss):
     def __init__(self, threshold, **kwargs):
         super(HuberLoss, self).__init__(**kwargs)
         self.loss = nn.HuberLoss(reduction='mean', delta=threshold)
     def forward(self, inputs, targets):
         return self.loss(inputs, targets), self.weight
+'''
 
-class KD_DKL(BaseLoss):
-    def __init__(self, T=3.0, temp_annealer=None, reduction='batchmean', **kwargs):
-        super(KD_DKL, self).__init__(**kwargs)
-
-        self.temp = T
-        self.dist = torch.nn.KLDivLoss(reduction='batchmean')
+class CCELoss(Loss):
+    '''
+    Wrapper for the PyTorch Cross Entropy Loss
+    Expects args[0] to be model logits
+    '''
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.criterion = nn.CrossEntropyLoss()
         
-        self.temp_annealer = temp_annealer
+    def forward(self, inputs, label, mask, observers, *args):
+        return self.criterion(args[0], label)
 
-    def forward(self, student_logits, teacher_logits):
-        if self.temp_annealer is not None:
-            T = self.temp * self.temp_annealer()
-            self.temp_annealer.step()
-        else:
-            T = self.temp
-        
-        teacher_probs = torch.nn.functional.softmax(teacher_logits/T, dim=-1)
-        student_probs = torch.nn.functional.log_softmax(student_logits/T, dim=-1)
-
-        distance = self.dist(student_probs, teacher_probs)
-        distance = distance*(T**2)
-        return self.apply_weight(distance)
-
-class ChamferDist(BaseLoss):
+class ChamferDist(Loss):
+    '''
+    Pure PyTorch implementation of Chamfer Distance
+    Expects args[0] to be VAE reconstructed data & inputs[1] to be the original inputs
+    '''
     def __init__(self, p_order = 2, squared=True, **kwargs):
         super(ChamferDist, self).__init__(**kwargs)
 
         self.p = p_order
         self.squared = squared
 
-    def forward(self, recon, target, mask):
+    def forward(self, inputs, label, mask, observers, *args):
 
+        recon = args[0]
+        target = inputs[1]
+        
         batch_losses = []
 
         for i in range(recon.size(0)):
@@ -76,14 +77,20 @@ class ChamferDist(BaseLoss):
         
         return torch.stack(batch_losses).mean()
 
-class BVAELoss(BaseLoss):
+class BVAELoss(Loss):
+    '''
+    Beta VAE
+    '''
     def __init__(self, beta, bit=None, **kwargs):
         super(BVAELoss, self).__init__(**kwargs)
         
         self.beta = beta
         self.bit = bit
 
-    def forward(self, mu, log_var):
+    def forward(self, inputs, label, mask, observers, *args):
+
+        mu = args[1]
+        log_var = args[2]
 
         kld_dim = -0.5 * (1 + log_var - mu ** 2 - log_var.exp())
 
@@ -91,9 +98,10 @@ class BVAELoss(BaseLoss):
             kld_dim = torch.clamp(kld_dim, min=self.bit)
         kld_loss = torch.mean(torch.sum(kld_dim, dim=1), dim=0)
 
-        return kld_loss, self.beta
+        return self.beta*kld_loss
 
-class TCVAELoss(BaseLoss):
+'''
+class TCVAELoss(Loss):
     def __init__(self, alpha, beta, gamma, use_mss=True, bit=None, **kwargs):
         super(TCVAELoss, self).__init__(**kwargs)
         
@@ -215,3 +223,4 @@ def _get_log_pz_qz_prodzi_qzCx(latent_sample, latent_dist, n_data, is_mss=True):
         log_prod_qzi = torch.logsumexp(mat_log_qz, dim=1, keepdim=False).sum(1)
 
     return log_pz, log_qz, log_prod_qzi, log_q_zCx
+'''

@@ -1,6 +1,6 @@
 import torch
 
-class AverageTracker:
+class Tracker:
     def __init__(self):
         self.total = 0.0
         self.count = 0

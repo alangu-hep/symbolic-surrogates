@@ -60,7 +60,7 @@ suffix=${COMMENT:-default}
         --lr-scheduler flat+decay \
         --model-network ${NETWORK} \
         --model-prefix ${MODEL_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${COMP} \
-        --sr-prefix ${SR_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${TEACHER_NAME}_${DR_NAME}_${COMP} \
+        --surrogate-prefix ${SR_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${TEACHER_NAME}_${DR_NAME}_${COMP} \
         --log ${LOGS}/${SIGNAL}/${MODEL}_${suffix}_${COMP}_${DATE}.log \
         --metrics-prefix ${METRIC_OUTPUTS}/${SIGNAL}/${MODEL}_${suffix}_${DATA_FRACTION}.root \
         --max-size 40 \

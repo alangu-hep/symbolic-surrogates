@@ -45,7 +45,7 @@ def initialize_models(training, network, data_config, model_path=None):
 
     return model_metadata
 
-class BaseLoader(ABC):
+class ModelLoader(ABC):
     def __init__(self, model_name, teacher_name=None):
         self.model_name = model_name
         self.teacher_name = teacher_name
@@ -60,8 +60,8 @@ class BaseLoader(ABC):
     def get_teacher(self):
         return self.teacher_name
 
-class TorchLoader(BaseLoader):
-    def __init__(self, network_path, data_config, model_path, **kwargs):
+class TorchLoader(ModelLoader):
+    def __init__(self, network_path, data_config, model_path=None, **kwargs):
         super().__init__(**kwargs)
         self.network = network_path
         self.config = data_config
@@ -71,37 +71,16 @@ class TorchLoader(BaseLoader):
         model_dict = initialize_models(training=False, network=self.network, data_config=self.config, model_path=self.model_path)
         return model_dict['model']
 
-class SurrogateLoader(BaseLoader):
-    def __init__(self, sr_path, vae_network, vae_path, data_config, equations: list, **kwargs):
+class SurrogateLoader(ModelLoader):
+    def __init__(self, sr_path, equations = None, **kwargs):
         super().__init__(**kwargs)
         self.sr_path = sr_path
-        self.vae_network = vae_network
-        self.config = data_config
-        self.vae_path = vae_path
         self.equations = equations
 
     def load(self):
-        regressor = PySRRegressor.from_file(run_directory = self.sr_path)
-        vae = initialize_models(training=False, network=self.vae_network, data_config=self.config, model_path=self.vae_path)['model']
-        modules = regressor.pytorch(self.equations)
-        surrogate = surrogates.FullSurrogate(modules, dr=vae)
+        self.regressor = PySRRegressor.from_file(run_directory = self.sr_path)
+        modules = self.regressor.pytorch(self.equations)
+        surrogate = surrogates.BasicSurrogate(modules)
         return surrogate
     def fetch_equations(self):
-        regressor = PySRRegressor.from_file(run_directory = self.sr_path)
-        return regressor.sympy(self.equations)
-
-class HingeLoader(BaseLoader):
-    def __init__(self, sr_path, vae_network, vae_path, data_config, equation, **kwargs):
-        super().__init__(**kwargs)
-        self.sr_path = sr_path
-        self.vae_network = vae_network
-        self.config = data_config
-        self.vae_path = vae_path
-        self.equation = equation
-
-    def load(self):
-        regressor = PySRRegressor.from_file(run_directory = self.sr_path)
-        vae = initialize_models(training=False, network=self.vae_network, data_config=self.config, model_path=self.vae_path)['model']
-        module = regressor.pytorch(self.equation)
-        surrogate = surrogates.HingeSurrogate(module, dr=vae)
-        return surrogate
+        return self.regressor.sympy(self.equations)

@@ -62,7 +62,7 @@ def train_load(args):
     _logger.info('Using %d files for training, range: %s' % (len(train_files), str(train_range)))
     _logger.info('Using %d files for validation, range: %s' % (len(val_files), str(val_range)))
 
-    train_data = SimpleIterDataset(train_file_dict, args.data_config, for_training=True,
+    train_data = SimpleIterDataset(train_file_dict, args.data_config, for_training=args.for_training,
                                    extra_selection=None,
                                    remake_weights=not False,
                                    load_range_and_fraction=(train_range, args.data_fraction),
@@ -72,7 +72,7 @@ def train_load(args):
                                    infinity_mode=False,
                                    in_memory=False,
                                    name='train')
-    val_data = SimpleIterDataset(val_file_dict, args.data_config, for_training=True,
+    val_data = SimpleIterDataset(val_file_dict, args.data_config, for_training=args.for_training,
                                  extra_selection=None,
                                  load_range_and_fraction=(val_range, args.data_fraction),
                                  file_fraction=args.file_fraction,
