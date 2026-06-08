@@ -1,4 +1,5 @@
 import awkward as ak
+from weaver.utils.logger import _logger
 
 def _write_outputs_to_root(path, rootdir_dict, compression=-1, step=1048576):
     '''
@@ -12,16 +13,16 @@ def _write_outputs_to_root(path, rootdir_dict, compression=-1, step=1048576):
     
     with uproot.recreate(path, compression=compression) as fout:
 
-        print(f'Writing outputs to ROOT file at: {path}')
+        _logger.info(f'Writing outputs to ROOT file at: {path}')
         
         for t_tree, branch in rootdir_dict.items():
 
             if not branch:
-                print(f"Skipping empty tree: {t_tree}")
+                _logger.info(f"Skipping empty tree: {t_tree}")
                 continue
             
             table = ak.Array(branch)
-            print(f'Processing TTree: {t_tree}')
+            _logger.info(f'Processing TTree: {t_tree}')
             
             tree = fout.mktree(t_tree, {k: table[k].type for k in table.fields})
             start = 0

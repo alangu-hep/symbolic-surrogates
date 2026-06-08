@@ -22,6 +22,29 @@ import tqdm
 import time
 import copy
 
+def simulrun(handlers):
+    for handler in handlers:
+        handler.model.eval()
+    output_dicts = []
+    for dataloader in handlers[0].dataloaders:
+        data_config = dataloader.dataset.config
+        with tqdm.tqdm(dataloader) as tq:
+            for X, y, observers in tq:
+                inputs, label, mask = handlers[0].unpack_loader(X, y, data_config)
+                for handler in handlers:
+                    with torch.no_grad():
+                        model_output = handler.model(*inputs)
+                        model_output = model_output if isinstance(model_output, tuple) else (model_output,)
+                        if handler.loss is not None:
+                            loss = handler.loss(inputs, label, mask, *model_output)
+                        if handler.recorder is not None:
+                            handler.recorder.record_data(inputs, label, mask, observers, *model_output)
+    for handler in handlers:
+        if handler.recorder is not None:
+            output_dicts.append(handler.recorder.run())
+    return tuple(output_dicts)
+            
+
 class ModelHandler(ABC):
     def __init__(
         self,
@@ -48,7 +71,7 @@ class TorchHandler(ModelHandler):
         self,
         args,
         device,
-        dataloader: DataLoader,
+        dataloaders,
         opt_func=None,
         grad_scaler=None,
         clip_norm=None,
@@ -57,52 +80,55 @@ class TorchHandler(ModelHandler):
         super(TorchHandler, self).__init__(**kwargs)
         self.device = device
         self.model = copy.deepcopy(self.model_loader.load()).to(device)
-        self.dataloader = dataloader
-        self.opt, self.scheduler = opt_func(args, self.model, device)
+        self.dataloaders = dataloaders
+        if opt_func is not None:
+            self.opt, self.scheduler = opt_func(args, self.model, device)
         self.grad_scaler = grad_scaler
         self.clip_norm = clip_norm
-        self.data_config = dataloader.dataset.config
 
-    def unpack_loader(self, X, y):
-        inputs = [X[k].to(self.device) for k in self.data_config.input_names]
-        label = y[self.data_config.label_names[0]].long().to(self.device)
+    def unpack_loader(self, X, y, data_config):
+        inputs = [X[k].to(self.device) for k in data_config.input_names]
+        label = y[data_config.label_names[0]].long().to(self.device)
         try:
-            mask = y[self.data_config.label_names[0] + '_mask'].bool().to(self.device)
+            mask = y[data_config.label_names[0] + '_mask'].bool().to(self.device)
         except KeyError:
             mask = None
         return inputs, label, mask
 
     def fit(self):
         self.model.train()
-        with tqdm.tqdm(self.dataloader) as tq:
-            for X, y, observers in tq:
-                inputs, label, mask = self.unpack_loader(X, y)
-                self.opt.zero_grad()
-                
-                with torch.amp.autocast("cuda", enabled=self.grad_scaler is not None):
-                    model_output = self.model(*inputs)
-                    model_output = model_output if isinstance(model_output, tuple) else (model_output,)
-                    loss = self.loss(inputs, label, mask, *model_output)
-                    if self.recorder is not None:
-                        self.recorder.record_data(inputs, label, mask, observers, *model_output)
-
-                self.backprop(loss)
+        for dataloader in self.dataloaders:
+            data_config = dataloader.dataset.config
+            with tqdm.tqdm(dataloader) as tq:
+                for X, y, observers in tq:
+                    inputs, label, mask = self.unpack_loader(X, y, data_config)
+                    self.opt.zero_grad()
+                    
+                    with torch.amp.autocast("cuda", enabled=self.grad_scaler is not None):
+                        model_output = self.model(*inputs)
+                        model_output = model_output if isinstance(model_output, tuple) else (model_output,)
+                        loss = self.loss(inputs, label, mask, *model_output)
+                        if self.recorder is not None:
+                            self.recorder.record_data(inputs, label, mask, observers, *model_output)
+    
+                    self.backprop(loss)
 
         if self.recorder:
             return self.recorder.run()
 
     def predict(self):
         self.model.eval()
-        with tqdm.tqdm(self.dataloader) as tq:
-            for X, y, observers in tq:
-                inputs, label, mask = self.unpack_loader(X, y)
-                with torch.no_grad():
-                    model_output = self.model(*inputs)
-                    model_output = model_output if isinstance(model_output, tuple) else (model_output,)
-                    if self.loss is not None:
-                        loss = self.loss(inputs, label, mask, *model_output)
-                    if self.recorder is not None:
-                        self.recorder.record_data(inputs, label, mask, observers, *model_output)
+        for dataloader in self.dataloaders:
+            with tqdm.tqdm(dataloader) as tq:
+                for X, y, observers in tq:
+                    inputs, label, mask = self.unpack_loader(X, y)
+                    with torch.no_grad():
+                        model_output = self.model(*inputs)
+                        model_output = model_output if isinstance(model_output, tuple) else (model_output,)
+                        if self.loss is not None:
+                            loss = self.loss(inputs, label, mask, *model_output)
+                        if self.recorder is not None:
+                            self.recorder.record_data(inputs, label, mask, observers, *model_output)
         if self.recorder is not None:
             return self.recorder.run()
         
@@ -135,29 +161,32 @@ class SurrogateHandler(TorchHandler):
 
     def fit(self):
         self.model.train()
-        with tqdm.tqdm(self.dataloader) as tq:
-            for X, _ in tq:
-                inputs = X
-                with torch.amp.autocast("cuda", enabled=self.grad_scaler is not None):
-                    model_output = self.model(*inputs)
-                    model_output = model_output if isinstance(model_output, tuple) else (model_output,)
-                    if self.recorder:
-                        self.recorder.record_data(*model_output)
-                self.backprop(loss)
+        for dataloader in self.dataloaders:
+            with tqdm.tqdm(dataloader) as tq:
+                for X, _ in tq:
+                    inputs = X
+                    with torch.amp.autocast("cuda", enabled=self.grad_scaler is not None):
+                        model_output = self.model(inputs)
+                        model_output = model_output if isinstance(model_output, tuple) else (model_output,)
+                        loss = self.loss(inputs, label, mask, *model_output)
+                        if self.recorder:
+                            self.recorder.record_data(*model_output)
+                    self.backprop(loss)
 
         if self.recorder is not None:
             return self.recorder.run()
 
     def predict(self):
         self.model.eval()
-        with tqdm.tqdm(self.dataloader) as tq:
-            for X, _ in tq:
-                inputs = X
-                with torch.no_grad():
-                    model_output = self.model(*inputs)
-                    model_output = model_output if isinstance(model_output, tuple) else (model_output,)
-                    if self.recorder:
-                        self.recorder.record_data(*model_output)
+        for dataloader in self.dataloaders:
+            with tqdm.tqdm(dataloader) as tq:
+                for X, _ in tq:
+                    inputs = X
+                    with torch.no_grad():
+                        model_output = self.model(inputs)
+                        model_output = model_output if isinstance(model_output, tuple) else (model_output,)
+                        if self.recorder:
+                            self.recorder.record_data(*model_output)
         if self.recorder is not None:
             return self.recorder.run()
 
@@ -174,7 +203,7 @@ class EquationHandler(ModelHandler):
         self.inputs = inputs
         self.targets = targets
 
-    def fit(self, run_id, output_dir):
+    def fit(self, run_id, output_dir, input_names):
 
         args = self.args
         
@@ -199,7 +228,7 @@ class EquationHandler(ModelHandler):
             random_state=42
         )
 
-        regressor.fit(self.inputs, self.targets)
+        regressor.fit(self.inputs, self.targets, variable_names=input_names)
 
         return regressor
         

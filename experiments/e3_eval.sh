@@ -15,27 +15,36 @@ FIGURES=${WORKDIR}/figures
 
 SIGNALS=(
     TTBar
+    WToQQ
+    HToGG
 )
 
 MODELS=(
     ParT
+    ResNet
+    ParticleNet
 )
 
 EXPERIMENTS=(
     M1-CONTROL
+    M8-RESNET
+    M11-PARTICLENET
 )
 
 WRAPPERS=(
     part_wrapper.py
+    resnet.py
+    ParticleNet.py
 )
 
 # Run-Specific
 
-MODEL=Surrogate
+SURROGATE_NAME=Surrogate
+OBS_NAME=Observables
 DR_NAME=BVAE
 DR_NETWORK=${WORKDIR}/wrappers/vae.py
 
-DATA_FRACTION=0.01
+DATA_FRACTION=0.1
 
 suffix=${COMMENT:-default}
 
@@ -54,7 +63,6 @@ for i in "${!SIGNALS[@]}"; do
         MODEL_NAME=${MODELS[$mod]}
         EXPERIMENT=${EXPERIMENTS[$mod]}
         NETWORK=${WORKDIR}/wrappers/${WRAPPERS[$mod]}
-        
         MODEL_PATH=${WORKDIR}/outputs/models/${SIGNAL}/${MODEL_NAME}/${MODEL_NAME}_${EXPERIMENT}_DL_epoch-4_state.pt
     
         $CMD \
@@ -69,22 +77,22 @@ for i in "${!SIGNALS[@]}"; do
             "ZJetsToNuNu:${DATADIR}/Pythia/test_20M/ZJetsToNuNu_*.root" \
             --data-config ${CONFIG} \
             --file-fraction 1 \
+            --batch-size 64 \
             --data-fraction ${DATA_FRACTION} \
             --model-network ${NETWORK} \
-            --log ${LOGS}/${SIGNAL}/${MODEL}_${suffix}_${DATE}.log \
-            --max-size 40 \
-            --n-iterations 5000 \
-            --n-populations 50 \
-            --population-size 30 \
-            --iteration-cycles 1520 \
+            --log ${LOGS}/${SIGNAL}/${MODEL_NAME}_${suffix}_${DATE}.log \
             --dr-network ${DR_NETWORK} \
             --dr-path ${DR_PATH} \
-            --surrogate-prefix ${SR_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${MODEL_NAME}-S_${DR_NAME} \
+            --surrogate-prefix ${SR_OUTPUTS}/${SIGNAL}/${SURROGATE_NAME}/${SURROGATE_NAME}_E1-SURROGATES_${MODEL_NAME}-S_${DR_NAME} \
+            --observable-prefix ${SR_OUTPUTS}/${SIGNAL}/${OBS_NAME}/${OBS_NAME}_E2-OBSERVABLES_${DR_NAME} \
+            --run-prefix ${METRIC_OUTPUTS}/${SIGNAL}/${MODEL_NAME}_${suffix}_${DR_NAME}/${MODEL_NAME} \
             --model-path ${MODEL_PATH} \
             --dl-name ${MODEL_NAME} \
             --vae-name ${DR_NAME} \
             --surrogate-name ${MODEL_NAME}-S \
-            --surrogate-fraction 0.1 
+            --observable-name ${OBS_NAME} \
+            --surrogate-fraction 0.01 \
+            --observable-fraction 0.01
     done
 
     EXIT_CODE=$?

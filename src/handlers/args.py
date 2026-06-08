@@ -80,28 +80,47 @@ def setup_argparse():
     
     parser.add_argument('--binary-operators', default=[
         "+", 
-        "-", 
         "*", 
         "/", 
         "^",
     ])
     parser.add_argument('--unary-operators', default=[
-        "sqrt", 
-        "tanh",
-        "sin",
+        "log", 
+        "sqrt",
+        "exp"
     ])
     parser.add_argument('--constraints', default={
-        '^': (-1, 1)
+        '^': (-1, 1),
+        'exp': 3
     })
+    
     parser.add_argument('--nested-constraints', default={
-        "*": {"tanh": 2},
-        "tanh": {"tanh": 0, "^": 1, "sin": 1},
-        "sin": {"sin": 0}       
+        'log': {
+            'log': 0,
+            'sqrt': 1,
+            'exp': 1,
+            '^': 1,
+            '*': 2,
+            '/': 2
+        },
+        'sqrt': {
+            'log': 1,
+            'exp': 1,
+            'sqrt': 0
+        },
+        'exp': {
+            'exp': 0,
+            '^': 0,
+            'log': 0
+        },
+        '^': {
+            'exp': 0
+        }
     })
 
     parser.add_argument('--sr-annealing', action='store_true', default = True)
     parser.add_argument('--sr-batching', action='store_true', default = True)
     parser.add_argument('--surrogate-fraction', type=float, default=0.1, help = 'Fraction of train data used for surrogate SR')
-    parser.add_argument('--feature-fraction', type=float, default=0.01, help = 'Fraction of train data used for observable SR')
+    parser.add_argument('--observable-fraction', type=float, default=0.01, help = 'Fraction of train data used for observable SR')
     
     return parser

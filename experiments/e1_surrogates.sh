@@ -39,13 +39,11 @@ WRAPPERS=(
 
 # Run-Specific
 
-COMP=SR
-
 MODEL=Surrogate
 DR_NAME=BVAE
 DR_NETWORK=${WORKDIR}/wrappers/vae.py
 
-DATA_FRACTION=0.01
+DATA_FRACTION=0.1
 
 suffix=${COMMENT:-default}
 
@@ -67,9 +65,7 @@ for i in "${!SIGNALS[@]}"; do
         
         MODEL_PATH=${WORKDIR}/outputs/models/${SIGNAL}/${MODEL_NAME}/${MODEL_NAME}_${EXPERIMENT}_DL_epoch-4_state.pt
     
-    
         $CMD \
-            --comp ${COMP} \
             --data-train \
             "${SIGNAL}:${DATADIR}/Pythia/train_100M/${SIGNAL}_*.root" \
             "ZJetsToNuNu:${DATADIR}/Pythia/train_100M/ZJetsToNuNu_*.root" \
@@ -82,14 +78,8 @@ for i in "${!SIGNALS[@]}"; do
             --data-config ${CONFIG} \
             --file-fraction 1 \
             --data-fraction ${DATA_FRACTION} \
-            --batch-size 64 \
-            --num-epochs 5 \
-            --optimizer ranger \
-            --start-lr 1e-3 \
-            --final-lr 1e-3 \
-            --lr-scheduler flat+decay \
             --model-network ${NETWORK} \
-            --log ${LOGS}/${SIGNAL}/${MODEL}_${suffix}_${COMP}_${DATE}.log \
+            --log ${LOGS}/${SIGNAL}/${MODEL}_${suffix}_${DATE}.log \
             --max-size 40 \
             --n-iterations 4560 \
             --n-populations 48 \
@@ -97,9 +87,12 @@ for i in "${!SIGNALS[@]}"; do
             --iteration-cycles 1520 \
             --dr-network ${DR_NETWORK} \
             --dr-path ${DR_PATH} \
-            --sr-prefix ${SR_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${MODEL_NAME}_${DR_NAME}_${COMP} \
-            --for-training \
-            --model-path ${MODEL_PATH}
+            --surrogate-prefix ${SR_OUTPUTS}/${SIGNAL}/${MODEL}/${MODEL}_${suffix}_${MODEL_NAME}-S_${DR_NAME} \
+            --model-path ${MODEL_PATH} \
+            --dl-name ${MODEL_NAME} \
+            --vae-name ${DR_NAME} \
+            --surrogate-name ${MODEL_NAME}-S \
+            --surrogate-fraction 0.01 
     done
 
     EXIT_CODE=$?

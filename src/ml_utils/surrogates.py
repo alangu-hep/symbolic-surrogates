@@ -8,13 +8,13 @@ class BasicSurrogate(torch.nn.Module):
         super().__init__()
 
         if isinstance(modules, list):
-            self.eqs = nn.ModuleList(modules)
+            self.eqs = torch.nn.ModuleList(modules)
         else:
-            self.eqs = nn.ModuleList([modules])
+            self.eqs = torch.nn.ModuleList([modules])
 
     def forward(self, x):
-
-        return [eq(x) for eq in self.eqs]
+        outputs = [eq(x) for eq in self.eqs]
+        return outputs[0] if len(outputs) == 1 else torch.cat(outputs, dim=-1)
 
 class FullSurrogate(torch.nn.Module):
     def __init__(self, modules, dr):

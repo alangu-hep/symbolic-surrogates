@@ -28,7 +28,7 @@ class HuberLoss(Loss):
         return self.loss(inputs, targets), self.weight
 '''
 
-class CCELoss(Loss):
+class HuberLoss(Loss):
     '''
     Wrapper for the PyTorch Cross Entropy Loss
     Expects args[0] to be model logits
@@ -40,6 +40,18 @@ class CCELoss(Loss):
     def forward(self, inputs, label, mask, observers, *args):
         return self.criterion(args[0], label)
 
+class CCELoss(Loss):
+    '''
+    Wrapper for the PyTorch Cross Entropy Loss
+    Expects args[0] to be model logits
+    '''
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.criterion = nn.CrossEntropyLoss()
+        
+    def forward(self, inputs, label, mask, observers, *args):
+        return self.criterion(args[0], label)
+        
 class ChamferDist(Loss):
     '''
     Pure PyTorch implementation of Chamfer Distance
