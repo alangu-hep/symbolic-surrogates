@@ -28,7 +28,6 @@ def bkg_rej(labels, preds, eff = 0.5):
     idx = next(idx for idx, v in enumerate(tpr) if v>eff)
     rej = 1/fpr[idx]
 
-
     return rej
 
 def confusion_matrices(labels, preds):
