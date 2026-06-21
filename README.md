@@ -1,9 +1,3 @@
-```python
-import panel as pn
-# You must specify a template (e.g., 'fast', 'bootstrap', or 'vanilla')
-pn.extension(template='fast')
-```
-
 # Symbolic Distillation of Black-Box Jet Taggers via Autoencoder Latent Spaces
 
 This repo includes a two-step symbolic distillation framework to interpret deep learning jet taggers, along with its accompanying experiments.
