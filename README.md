@@ -8,7 +8,7 @@ pn.extension(template='fast')
 
 This repo includes a two-step symbolic distillation framework to interpret deep learning jet taggers, along with its accompanying experiments.
 
-![framework_chart](figures/framework_chart.pdf)
+![framework_chart](figures/framework_chart.png)
 
 ## Overview
 
