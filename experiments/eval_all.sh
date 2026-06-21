@@ -11,7 +11,6 @@ MODEL_OUTPUTS=${WORKDIR}/outputs/models
 METRIC_OUTPUTS=${WORKDIR}/outputs/metrics
 SR_OUTPUTS=${WORKDIR}/outputs/sr_runs
 LOGS=${WORKDIR}/outputs/logs
-FIGURES=${WORKDIR}/figures
 
 SIGNALS=(
     TTBar
