@@ -6,7 +6,7 @@ This repo includes a two-step symbolic distillation framework to interpret deep 
 
 ## Overview
 
-As deep learning (DL) models used for high-energy jet tagging become increasingly complex, they lose their interpretability, becoming black-boxes. Symbolic distillation, the process of "distilling" the knowledge of a DL "teacher" into a "student" symbolic regression algorithm, has found success in opening the black box. However, the increasing usage of particle clouds as inputs to DL models has created an input format discrepancy between neural networks and equations. We introduce a framework that uses the latent space of a variational autoencoder to (1) compress particle cloud input data into a tabular set of variables interpretable with jet observables and (2) serve as inputs for symbolic surrogates.
+As deep learning (DL) models used for high-energy jet tagging become increasingly complex, they lose their interpretability, becoming black-boxes. Symbolic distillation, the process of "distilling" the knowledge of a DL "teacher" into a "student" symbolic regression algorithm, has found success in interpretably approximating black-box outputs. However, the increasing usage of particle clouds as inputs to DL models has created an input format discrepancy between neural networks and equations. We introduce a framework that uses the latent space of a variational autoencoder to (1) compress particle cloud input data into a tabular set of variables interpretable with jet observables and (2) serve as inputs for symbolic surrogates.
 
 ## Getting Started
 
