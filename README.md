@@ -1,4 +1,4 @@
-# Symbolic Distillation of Black-Box Jet Taggers via Autoencoder Latent Spaces
+# Autoencoders for Symbolic Distillation of Black-Boxes
 
 This repo includes a two-step symbolic distillation framework to approximate the outputs of deep learning jet taggers, along with its accompanying experiments.
 
