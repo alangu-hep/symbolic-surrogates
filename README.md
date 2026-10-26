@@ -1,6 +1,6 @@
 # Autoencoders for Symbolic Distillation of Black-Boxes
 
-This repo includes a two-step symbolic distillation framework to approximate the outputs of deep learning jet taggers, along with its accompanying experiments.
+This repo includes a three-step symbolic distillation framework to approximate the outputs of deep learning jet taggers, along with its accompanying experiments.
 
 ![framework_chart](figures/framework_chart.png)
 
